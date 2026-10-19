@@ -7,7 +7,7 @@ export const estadoChurro = {
 
 const ESCRITORIO = {
     hero: { x: 0.34, y: 0.0, escala: 1.02, yaw: -0.5, pitch: 0.1, inclinacion: 0.3 },
-    manifiesto: { x: -0.56, y: -0.02, escala: 0.6, yaw: 0.55, pitch: -0.06, inclinacion: -0.3 },
+    manifiesto: { x: -0.78, y: -0.02, escala: 0.48, yaw: 0.35, pitch: -0.06, inclinacion: -0.3 },
     proceso: { x: 0.34, y: 0.0, escala: 1.15, yaw: 0, pitch: -0.1, inclinacion: -0.1, bloquearRoll: true },
     menu: { x: 0.86, y: 0.82, escala: 0.26, yaw: -0.4, pitch: 0, inclinacion: 0.5 },
     resenas: { x: -0.92, y: -0.82, escala: 0.001, yaw: 0.6, pitch: 0, inclinacion: -0.4 },

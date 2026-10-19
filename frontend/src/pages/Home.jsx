@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import Cierre from "../components/sections/Cierre";
 import Cintas from "../components/sections/Cintas";
 import ComoSeHace from "../components/sections/ComoSeHace";
@@ -19,13 +19,15 @@ export default function Home() {
     useTitulo();
     useRefrescarScroll();
     const { local, error } = useLocal();
-    const conWebGL = useMemo(() => hayWebGL(), []);
+    const soportaWebGL = useMemo(() => hayWebGL(), []);
+    const [contextoPerdido, setContextoPerdido] = useState(false);
+    const conWebGL = soportaWebGL && !contextoPerdido;
 
     return (
         <div className="home">
             {conWebGL && (
                 <Suspense fallback={null}>
-                    <ChurroCanvas />
+                    <ChurroCanvas alPerderContexto={() => setContextoPerdido(true)} />
                 </Suspense>
             )}
             <Hero local={local} sinWebGL={!conWebGL} />

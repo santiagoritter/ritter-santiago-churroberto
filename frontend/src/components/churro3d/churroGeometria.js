@@ -55,24 +55,14 @@ const marcoEn = (curva, t) => {
     return { P, T, N, B };
 };
 
-const puntoDelAnillo = (marco, theta, factor = 1, radioBase = RADIO, profundidad = PROFUNDIDAD_SURCO) => {
-    const radio = radioDelPerfil(theta, radioBase, profundidad) * factor;
+const puntoDelAnillo = (marco, theta, factor = 1) => {
+    const radio = radioDelPerfil(theta, RADIO, PROFUNDIDAD_SURCO) * factor;
     return marco.P.clone()
         .addScaledVector(marco.N, radio * Math.cos(theta))
         .addScaledVector(marco.B, radio * Math.sin(theta));
 };
 
-export const RADIO_CHURRO = RADIO;
-
-// Con los valores por defecto sale el churro. Para el borde de sticker se pide una versión más ancha, de surcos
-// casi lisos y con los extremos adelantados: así envuelve al churro entero sin meterse en sus surcos.
-export function crearGeometriaChurro({
-    radio = RADIO,
-    profundidad = PROFUNDIDAD_SURCO,
-    extremo = 0,
-    hundido = HUNDIDO_PUNTA,
-    biselado = true
-} = {}) {
+export function crearGeometriaChurro() {
     const curva = crearCurva();
     const marcos = Array.from({ length: SEGMENTOS + 1 }, (_, i) => marcoEn(curva, i / SEGMENTOS));
 
@@ -84,10 +74,9 @@ export function crearGeometriaChurro({
     // Cuerpo: anillos de estrella a lo largo de la curva. La última columna repite la primera para que la textura cierre.
     const anillos = marcos.map((marco, i) => {
         const t = i / SEGMENTOS;
-        const bisel = biselado ? 0.88 + 0.12 * suavizar(0, 0.035, Math.min(t, 1 - t)) : 1;
-        const adelanto = marco.T.clone().multiplyScalar(i === 0 ? -extremo : i === SEGMENTOS ? extremo : 0);
+        const bisel = 0.88 + 0.12 * suavizar(0, 0.035, Math.min(t, 1 - t));
         return Array.from({ length: COLUMNAS + 1 }, (_, j) =>
-            puntoDelAnillo(marco, (j / COLUMNAS) * Math.PI * 2, bisel, radio, profundidad).add(adelanto)
+            puntoDelAnillo(marco, (j / COLUMNAS) * Math.PI * 2, bisel)
         );
     });
 
@@ -136,7 +125,7 @@ export function crearGeometriaChurro({
         const haciaAfuera = marco.T.clone().multiplyScalar(punta === 0 ? -1 : 1);
         const anillo = anillos[punta === 0 ? 0 : SEGMENTOS];
         const base = posiciones.length / 3;
-        const centro = marco.P.clone().addScaledVector(haciaAfuera, extremo - hundido);
+        const centro = marco.P.clone().addScaledVector(haciaAfuera, -HUNDIDO_PUNTA);
 
         posiciones.push(centro.x, centro.y, centro.z);
         normales.push(haciaAfuera.x, haciaAfuera.y, haciaAfuera.z);
@@ -170,10 +159,31 @@ export function crearGeometriaChurro({
     return geometria;
 }
 
-// Borde de sticker: una funda lisa un poco más ancha y larga que el churro, dibujada del lado de atrás en blanco.
-// El radio mínimo de la funda supera siempre al máximo del churro, así nunca asoma por encima de los surcos.
-export const crearContorno = (grosor = 0.065) =>
-    crearGeometriaChurro({ radio: RADIO + grosor, profundidad: 0.045, extremo: grosor, hundido: 0, biselado: false });
+// Copia del churro para el borde de sticker. En los extremos la pared y la tapa comparten una normal intermedia,
+// así al empujar el borde hacia afuera las puntas quedan redondeadas y sin huecos.
+export function crearGeometriaContorno() {
+    const geometria = crearGeometriaChurro();
+    const normales = geometria.attributes.normal;
+    const curva = crearCurva();
+    const vertices = (SEGMENTOS + 1) * (COLUMNAS + 1);
+    const normal = new THREE.Vector3();
+
+    [
+        { t: 0, signo: -1, anilloPared: 0, baseTapa: vertices },
+        { t: 1, signo: 1, anilloPared: SEGMENTOS, baseTapa: vertices + COLUMNAS + 1 }
+    ].forEach(({ t, signo, anilloPared, baseTapa }) => {
+        const eje = curva.getTangentAt(t).normalize().multiplyScalar(signo);
+        for (let j = 0; j <= COLUMNAS; j += 1) {
+            const indicePared = anilloPared * (COLUMNAS + 1) + j;
+            normal.fromBufferAttribute(normales, indicePared).add(eje).normalize();
+            normales.setXYZ(indicePared, normal.x, normal.y, normal.z);
+            if (j < COLUMNAS) normales.setXYZ(baseTapa + 1 + j, normal.x, normal.y, normal.z);
+        }
+        normales.setXYZ(baseTapa, eje.x, eje.y, eje.z);
+    });
+    normales.needsUpdate = true;
+    return geometria;
+}
 
 export const crearNucleoDeRelleno = () => new THREE.TubeGeometry(crearCurva(), 110, RADIO_RELLENO, 24, false);
 

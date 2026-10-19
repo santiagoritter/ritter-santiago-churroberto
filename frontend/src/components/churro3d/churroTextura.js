@@ -1,49 +1,67 @@
 import * as THREE from "three";
 import { PUNTAS, aleatorioFijo } from "./churroGeometria";
 
-// Textura de masa frita: tostada en las crestas, más clara en los surcos, con manchas y vetas largas.
+const ANCHO = 256;
+const ALTO = 512;
+
+// Dibuja una forma y sus copias desplazadas un ancho o un alto: lo que sale por un borde entra por el opuesto,
+// así la textura se repite sin costuras ni a lo ancho ni a lo largo.
+const conCopias = (x, y, radio, dibujar) => {
+    for (const dx of [-ANCHO, 0, ANCHO]) {
+        for (const dy of [-ALTO, 0, ALTO]) {
+            const cx = x + dx;
+            const cy = y + dy;
+            if (cx + radio < 0 || cx - radio > ANCHO || cy + radio < 0 || cy - radio > ALTO) continue;
+            dibujar(cx, cy);
+        }
+    }
+};
+
+// Masa frita: tostada en las crestas, más clara en los surcos, con manchas suaves y sin vetas rasposas.
 export function crearTexturaMasa() {
-    const ancho = 256;
-    const alto = 512;
     const lienzo = document.createElement("canvas");
-    lienzo.width = ancho;
-    lienzo.height = alto;
+    lienzo.width = ANCHO;
+    lienzo.height = ALTO;
     const ctx = lienzo.getContext("2d");
     const azar = aleatorioFijo(77);
 
-    const degradado = ctx.createLinearGradient(0, 0, ancho, 0);
-    degradado.addColorStop(0, "#c9792a");
-    degradado.addColorStop(0.22, "#e8a23e");
-    degradado.addColorStop(0.5, "#f3bf5e");
-    degradado.addColorStop(0.78, "#e8a23e");
-    degradado.addColorStop(1, "#c9792a");
+    // La cresta (borde izquierdo y derecho) es la parte más tostada y el surco (centro) la más clara.
+    const degradado = ctx.createLinearGradient(0, 0, ANCHO, 0);
+    degradado.addColorStop(0, "#d98a2b");
+    degradado.addColorStop(0.2, "#eda93f");
+    degradado.addColorStop(0.5, "#f7c765");
+    degradado.addColorStop(0.8, "#eda93f");
+    degradado.addColorStop(1, "#d98a2b");
     ctx.fillStyle = degradado;
-    ctx.fillRect(0, 0, ancho, alto);
+    ctx.fillRect(0, 0, ANCHO, ALTO);
 
-    // Manchas tostadas
-    for (let i = 0; i < 260; i += 1) {
-        const x = azar() * ancho;
-        const y = azar() * alto;
-        const radio = 6 + azar() * 22;
-        const mancha = ctx.createRadialGradient(x, y, 0, x, y, radio);
-        const oscura = azar() > 0.35;
-        mancha.addColorStop(0, oscura ? "rgba(120, 58, 14, 0.22)" : "rgba(255, 226, 150, 0.2)");
-        mancha.addColorStop(1, "rgba(0, 0, 0, 0)");
-        ctx.fillStyle = mancha;
-        ctx.fillRect(x - radio, y - radio, radio * 2, radio * 2);
+    // Manchas tostadas y zonas más doradas, grandes y suaves
+    for (let i = 0; i < 90; i += 1) {
+        const x = azar() * ANCHO;
+        const y = azar() * ALTO;
+        const radio = 18 + azar() * 46;
+        const oscura = azar() > 0.45;
+        conCopias(x, y, radio, (cx, cy) => {
+            const mancha = ctx.createRadialGradient(cx, cy, 0, cx, cy, radio);
+            mancha.addColorStop(0, oscura ? "rgba(150, 78, 18, 0.2)" : "rgba(255, 232, 160, 0.22)");
+            mancha.addColorStop(1, "rgba(0, 0, 0, 0)");
+            ctx.fillStyle = mancha;
+            ctx.fillRect(cx - radio, cy - radio, radio * 2, radio * 2);
+        });
     }
 
-    // Vetas a lo largo del churro
-    for (let i = 0; i < 90; i += 1) {
-        const x = azar() * ancho;
-        const largo = 60 + azar() * 220;
-        const y = azar() * alto;
-        ctx.strokeStyle = azar() > 0.5 ? "rgba(110, 52, 12, 0.18)" : "rgba(255, 222, 140, 0.16)";
-        ctx.lineWidth = 1 + azar() * 2.5;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + (azar() - 0.5) * 6, y + largo);
-        ctx.stroke();
+    // Burbujitas de la fritura: puntitos claros y oscuros
+    for (let i = 0; i < 220; i += 1) {
+        const x = azar() * ANCHO;
+        const y = azar() * ALTO;
+        const radio = 1 + azar() * 2.4;
+        const clara = azar() > 0.5;
+        conCopias(x, y, radio, (cx, cy) => {
+            ctx.fillStyle = clara ? "rgba(255, 236, 170, 0.35)" : "rgba(130, 66, 14, 0.25)";
+            ctx.beginPath();
+            ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+            ctx.fill();
+        });
     }
 
     const textura = new THREE.CanvasTexture(lienzo);
