@@ -12,6 +12,8 @@ const VUELTA = Math.PI * 2;
 const RADIANES_POR_PIXEL = 0.0042;
 const PROPIEDADES = ["x", "y", "escala", "yaw", "pitch", "inclinacion"];
 const GROSOR_CONTORNO_PX = 11;
+// Máxima velocidad de giro sobre su eje: poco más de una vuelta por segundo, por rápido que se scrollee.
+const VELOCIDAD_MAXIMA_GIRO = 7;
 const MARGEN_CORTE_CONTORNO = 0.07;
 
 const amortiguar = THREE.MathUtils.damp;
@@ -40,6 +42,10 @@ export default function Churro({ esMovil, menosMovimiento }) {
         corte: 0
     });
     const puntero = useRef({ x: 0, y: 0, objetivoX: 0, objetivoY: 0 });
+    // Reacciones: una vuelta extra con salto (impulso) y un poco de entusiasmo sobre los botones importantes.
+    const giroExtra = useRef({ actual: 0, objetivo: 0 });
+    const ultimoImpulso = useRef(estadoChurro.impulso);
+    const pulso = useRef(0);
 
     const geometrias = useMemo(
         () => ({
@@ -119,6 +125,27 @@ export default function Churro({ esMovil, menosMovimiento }) {
         return () => window.removeEventListener("pointermove", alMover);
     }, [menosMovimiento]);
 
+    // Pasar el mouse (o el foco) por un botón marcado con data-churro lo pone contento.
+    useEffect(() => {
+        const evaluar = (evento) => {
+            estadoChurro.entusiasmo = evento.target.closest?.("[data-churro]") ? 1 : 0;
+        };
+        const apagar = (evento) => {
+            if (!evento.relatedTarget?.closest?.("[data-churro]")) estadoChurro.entusiasmo = 0;
+        };
+        document.addEventListener("pointerover", evaluar);
+        document.addEventListener("focusin", evaluar);
+        document.addEventListener("pointerout", apagar);
+        document.addEventListener("focusout", apagar);
+        return () => {
+            document.removeEventListener("pointerover", evaluar);
+            document.removeEventListener("focusin", evaluar);
+            document.removeEventListener("pointerout", apagar);
+            document.removeEventListener("focusout", apagar);
+            estadoChurro.entusiasmo = 0;
+        };
+    }, []);
+
     useEffect(
         () => () => {
             Object.values(geometrias).forEach((geometria) => geometria.dispose());
@@ -151,13 +178,30 @@ export default function Churro({ esMovil, menosMovimiento }) {
             : menosMovimiento
               ? 0.4
               : posicionScroll() * RADIANES_POR_PIXEL;
-        actual.current.roll = amortiguar(actual.current.roll, rollObjetivo, pose.bloquearRoll ? 3.5 : 5, dt);
+        const rollSuavizado = amortiguar(actual.current.roll, rollObjetivo, pose.bloquearRoll ? 3.5 : 5, dt);
+        const pasoMaximo = VELOCIDAD_MAXIMA_GIRO * dt;
+        actual.current.roll += limitar(rollSuavizado - actual.current.roll, -pasoMaximo, pasoMaximo);
 
         actual.current.corte = amortiguar(actual.current.corte, estadoChurro.corte, 4, dt);
 
         // La inclinación hacia el mouse se suaviza para que nunca dé tirones.
         puntero.current.x = amortiguar(puntero.current.x, puntero.current.objetivoX, 4, dt);
         puntero.current.y = amortiguar(puntero.current.y, puntero.current.objetivoY, 4, dt);
+
+        if (estadoChurro.impulso !== ultimoImpulso.current) {
+            ultimoImpulso.current = estadoChurro.impulso;
+            if (!menosMovimiento) {
+                giroExtra.current.objetivo += VUELTA;
+                pulso.current = 1;
+            }
+        }
+        const faltaGirar =
+            amortiguar(giroExtra.current.actual, giroExtra.current.objetivo, 3.2, dt) - giroExtra.current.actual;
+        const pasoExtra = VELOCIDAD_MAXIMA_GIRO * 1.6 * dt;
+        giroExtra.current.actual += limitar(faltaGirar, -pasoExtra, pasoExtra);
+        pulso.current = amortiguar(pulso.current, 0, 5, dt);
+        actual.current.entusiasmo = amortiguar(actual.current.entusiasmo ?? 0, estadoChurro.entusiasmo, 6, dt);
+        const animo = menosMovimiento ? 0 : actual.current.entusiasmo;
 
         const ajuste = Math.min(1, viewport.width / 4.4);
         const flotar = menosMovimiento ? 0 : Math.sin(ahora * 1.3) * 0.05;
@@ -169,13 +213,13 @@ export default function Churro({ esMovil, menosMovimiento }) {
             (actual.current.y * viewport.height) / 2 + flotar,
             0
         );
-        grupo.scale.setScalar(ajuste * actual.current.escala);
+        grupo.scale.setScalar(ajuste * actual.current.escala * (1 + 0.1 * pulso.current + 0.07 * animo));
         grupo.rotation.set(
             actual.current.pitch - puntero.current.y * 0.12,
             actual.current.yaw + puntero.current.x * 0.28,
-            actual.current.inclinacion
+            actual.current.inclinacion + Math.sin(ahora * 9) * 0.04 * animo
         );
-        interno.current.rotation.x = actual.current.roll;
+        interno.current.rotation.x = actual.current.roll + giroExtra.current.actual;
 
         // Corte longitudinal: la mitad de adelante desaparece y se ve el relleno por dentro.
         const avance = limitar(actual.current.corte, 0, 1);

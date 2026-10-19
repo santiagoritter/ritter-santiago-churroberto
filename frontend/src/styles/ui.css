@@ -724,15 +724,17 @@ html[data-precarga="activa"] {
     border-radius: var(--radio-sticker);
     background: var(--fondo);
     box-shadow: var(--sombra-sticker);
-    transform: rotate(var(--inclinacion, 0deg));
+    transform: perspective(900px) rotate(var(--inclinacion, 0deg)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
     transition:
         transform 0.55s var(--ease-pop),
         box-shadow 0.3s ease;
+    will-change: transform;
 }
 
 .ficha:hover,
 .ficha:focus-within {
-    transform: rotate(0deg) translateY(-8px) scale(1.02);
+    transform: perspective(900px) rotate(0deg) translateY(-8px) scale(1.02) rotateX(var(--rx, 0deg))
+        rotateY(var(--ry, 0deg));
     box-shadow:
         0 2px 0 rgb(43 18 11 / 0.1),
         0 28px 38px -14px rgb(43 18 11 / 0.5);
@@ -964,7 +966,7 @@ html[data-precarga="activa"] {
     }
 
     .ficha:hover {
-        transform: rotate(var(--inclinacion, 0deg));
+        transform: perspective(900px) rotate(var(--inclinacion, 0deg));
         box-shadow: var(--sombra-sticker);
     }
 
@@ -983,4 +985,248 @@ html[data-precarga="activa"] {
         background: none;
         transform: none;
     }
+}
+
+/* ---------- Avisos: salida animada y botón de acción ---------- */
+.aviso--saliendo {
+    animation: aviso-sale 0.32s var(--ease-salida) forwards;
+    pointer-events: none;
+}
+
+@keyframes aviso-sale {
+    to {
+        opacity: 0;
+        transform: translateX(2.5rem) scale(0.92);
+    }
+}
+
+.aviso__texto {
+    display: grid;
+    gap: 0.4rem;
+    justify-items: start;
+    min-width: 0;
+}
+
+.aviso__accion {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.25em;
+}
+
+.aviso__accion:hover {
+    color: var(--error);
+}
+
+/* ---------- Cajón lateral del pedido ---------- */
+.cajon {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(27rem, 100vw);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-left: var(--borde-sticker);
+    border-radius: var(--radio-sticker) 0 0 var(--radio-sticker);
+    background: var(--azucar);
+    color: var(--cacao);
+    overscroll-behavior: contain;
+    box-shadow: -30px 0 60px -24px rgb(43 18 11 / 0.55);
+}
+
+.cajon[open] {
+    animation: cajon-entra 0.55s var(--ease-salida);
+}
+
+.cajon[data-cerrando] {
+    animation: cajon-sale 0.3s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+.cajon::backdrop {
+    background: rgb(43 18 11 / 0.55);
+    backdrop-filter: blur(4px);
+    animation: fundido-entra 0.45s ease;
+}
+
+.cajon[data-cerrando]::backdrop {
+    animation: fundido-sale 0.3s ease forwards;
+}
+
+.cajon__interior {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    height: 100%;
+}
+
+.cajon__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.4rem 1.4rem 1rem;
+}
+
+.cajon__titulo {
+    font-size: var(--fs-h3);
+}
+
+.cajon__cerrar {
+    display: grid;
+    place-items: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border: 3px solid var(--cacao);
+    border-radius: 50%;
+    background: var(--azucar);
+    transition: transform 0.35s var(--ease-pop);
+}
+
+.cajon__cerrar:hover {
+    transform: rotate(90deg);
+}
+
+.cajon__vacio {
+    grid-row: 2 / 4;
+    padding-inline: 1.4rem;
+}
+
+.cajon__items {
+    display: grid;
+    align-content: start;
+    gap: 0.9rem;
+    padding: 0.4rem 1.4rem 1rem;
+    overflow-y: auto;
+}
+
+.cajon-item {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    grid-template-areas:
+        "arte datos quitar"
+        "arte cantidad cantidad";
+    gap: 0.4rem 0.9rem;
+    align-items: center;
+    padding: 0.8rem;
+    border: 3px solid var(--cacao);
+    border-radius: 22px;
+    background: var(--manteca);
+    animation: cajon-item 0.55s var(--ease-salida) both;
+    animation-delay: calc(var(--i, 0) * 70ms + 0.2s);
+}
+
+.cajon-item__arte {
+    grid-area: arte;
+}
+
+.cajon-item__datos {
+    grid-area: datos;
+    min-width: 0;
+}
+
+.cajon-item .stepper {
+    grid-area: cantidad;
+    justify-self: start;
+}
+
+.cajon-item__quitar {
+    grid-area: quitar;
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+}
+
+.cajon-item__quitar:hover {
+    background: var(--error-fondo);
+    color: var(--error);
+}
+
+.cajon-item__nombre {
+    font-family: var(--fuente-titulo);
+    font-size: 1.1rem;
+    line-height: 1.05;
+}
+
+.cajon-item__precio {
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.cajon__pie {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.2rem 1.4rem 1.4rem;
+    border-top: 3px dashed var(--cacao);
+    background: var(--azucar);
+}
+
+.cajon__total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    font-weight: 800;
+}
+
+.cajon__total strong {
+    font-family: var(--fuente-titulo);
+    font-size: 2rem;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes cajon-entra {
+    from {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes cajon-sale {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes cajon-item {
+    from {
+        opacity: 0;
+        transform: translateX(2rem);
+    }
+}
+
+@keyframes fundido-entra {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes fundido-sale {
+    to {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .cajon {
+        border-radius: 0;
+    }
+}
+
+/* La "×" del buscador, con el mismo trazo que el resto de los íconos. */
+.campo__control[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-left: 0.5rem;
+    background: var(--cacao);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E")
+        center / contain no-repeat;
+    cursor: pointer;
 }

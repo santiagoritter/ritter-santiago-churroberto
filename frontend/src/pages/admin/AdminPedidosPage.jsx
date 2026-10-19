@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "../../components/ui/Button";
+import Filtros from "../../components/ui/Filtros";
 import { Cargando, EstadoError, EstadoVacio } from "../../components/ui/Estados";
 import Insignia from "../../components/ui/Insignia";
 import { useConfirm } from "../../context/ConfirmContext";
@@ -26,12 +27,35 @@ const SIGUIENTES = {
     CANCELADO: []
 };
 
+// Lo que dice cada botón según el estado al que lleva.
+const ACCIONES = {
+    EN_PREPARACION: "Empezar a preparar",
+    LISTO: "Marcar como listo",
+    EN_CAMINO: "Sale a repartir",
+    ENTREGADO: "Marcar como entregado",
+    CANCELADO: "Cancelar"
+};
+
 export default function AdminPedidosPage() {
     useTitulo("Administrar pedidos");
     const toast = useToast();
     const confirmar = useConfirm();
     const [actualizando, setActualizando] = useState(null);
+    const [filtro, setFiltro] = useState("TODOS");
     const { datos, error, cargando, recargar } = useAsync((signal) => listarTodosLosPedidos({ signal }));
+
+    // Cuántos pedidos hay en cada estado, para mostrarlo en los filtros.
+    const conteos = useMemo(() => {
+        const cuenta = { TODOS: datos?.length ?? 0 };
+        datos?.forEach((pedido) => {
+            cuenta[pedido.estado] = (cuenta[pedido.estado] ?? 0) + 1;
+        });
+        return cuenta;
+    }, [datos]);
+    const visibles = useMemo(
+        () => (filtro === "TODOS" ? datos : datos?.filter((pedido) => pedido.estado === filtro)),
+        [datos, filtro]
+    );
 
     const mover = async (pedido, estado) => {
         if (estado === "CANCELADO") {
@@ -67,16 +91,34 @@ export default function AdminPedidosPage() {
             )}
 
             {datos?.length > 0 && (
+                <Filtros
+                    etiqueta="Filtrar por estado"
+                    valor={filtro}
+                    alElegir={setFiltro}
+                    opciones={["TODOS", ...Object.keys(ETIQUETAS_ESTADO)].map((estado) => ({
+                        valor: estado,
+                        etiqueta: estado === "TODOS" ? "Todos" : ETIQUETAS_ESTADO[estado],
+                        cuenta: conteos[estado] ?? 0
+                    }))}
+                />
+            )}
+
+            {visibles?.length === 0 && datos?.length > 0 && (
+                <EstadoVacio titulo="No hay pedidos en este estado" nivel={3} />
+            )}
+
+            {visibles?.length > 0 && (
                 <ul className="lista-pedidos">
-                    {datos.map((pedido) => (
+                    {visibles.map((pedido) => (
                         <li key={pedido.id} className="tarjeta-pedido sticker">
                             <div className="tarjeta-pedido__cabecera">
                                 <h3 className="tarjeta-pedido__titulo">Pedido {pedido.id}</h3>
                                 <Insignia tono={TONO_ESTADO[pedido.estado]}>{ETIQUETAS_ESTADO[pedido.estado]}</Insignia>
                             </div>
                             <p className="tarjeta-pedido__meta">
-                                {formatearFecha(pedido.fecha)}. {ETIQUETAS_ENTREGA[pedido.tipoEntrega]}.{" "}
-                                {ETIQUETAS_PAGO[pedido.metodoPago]}.
+                                <span>{formatearFecha(pedido.fecha)}</span>
+                                <span>{ETIQUETAS_ENTREGA[pedido.tipoEntrega]}</span>
+                                <span>{ETIQUETAS_PAGO[pedido.metodoPago]}</span>
                             </p>
                             {pedido.direccionEntrega && (
                                 <p className="tarjeta-pedido__meta">Dirección: {pedido.direccionEntrega}</p>
@@ -101,9 +143,7 @@ export default function AdminPedidosPage() {
                                                 cargando={actualizando === pedido.id}
                                                 onClick={() => mover(pedido, estado)}
                                             >
-                                                {estado === "CANCELADO"
-                                                    ? "Cancelar"
-                                                    : `Pasar a ${ETIQUETAS_ESTADO[estado].toLowerCase()}`}
+                                                {ACCIONES[estado]}
                                             </Button>
                                         ))}
                                 </div>

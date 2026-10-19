@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import SeguimientoPedido from "../components/pedidos/SeguimientoPedido";
 import SplitText from "../components/effects/SplitText";
 import Button from "../components/ui/Button";
 import { Cargando, EstadoError, EstadoVacio } from "../components/ui/Estados";
@@ -6,6 +7,9 @@ import Insignia from "../components/ui/Insignia";
 import { useConfirm } from "../context/ConfirmContext";
 import { useToast } from "../context/ToastContext";
 import { useAsync } from "../hooks/useAsync";
+import { useAvisoDeEstado } from "../hooks/useAvisoDeEstado";
+import { usePedirDeNuevo } from "../hooks/usePedirDeNuevo";
+import { useRefrescoPeriodico } from "../hooks/useRefrescoPeriodico";
 import { useTitulo } from "../hooks/useTitulo";
 import { cancelarPedido, listarMisPedidos } from "../services/pedidosService";
 import { ETIQUETAS_ENTREGA, ETIQUETAS_ESTADO, TONO_ESTADO, formatearFecha, formatearPrecio } from "../utils/format";
@@ -16,6 +20,13 @@ export default function MisPedidosPage() {
     const confirmar = useConfirm();
     const { datos, error, cargando, recargar } = useAsync((signal) => listarMisPedidos({ signal }));
     const [cancelando, setCancelando] = useState(null);
+    const { pedirDeNuevo, pidiendoId } = usePedirDeNuevo();
+
+    // Mientras haya pedidos en curso, se consulta cada tanto y se avisa si alguno cambió de estado.
+    const hayEnCurso = datos?.some((pedido) => !["ENTREGADO", "CANCELADO"].includes(pedido.estado)) ?? false;
+    const refrescar = useCallback(() => recargar(), [recargar]);
+    useRefrescoPeriodico(refrescar, { activo: hayEnCurso });
+    const registrarCambioPropio = useAvisoDeEstado(datos);
 
     const cancelar = async (pedido) => {
         const acepto = await confirmar({
@@ -30,6 +41,7 @@ export default function MisPedidosPage() {
         setCancelando(pedido.id);
         try {
             await cancelarPedido(pedido.id);
+            registrarCambioPropio(pedido.id, "CANCELADO");
             toast.exito(`Cancelamos el pedido ${pedido.id}.`);
             recargar();
         } catch (fallo) {
@@ -66,8 +78,10 @@ export default function MisPedidosPage() {
                                     </Insignia>
                                 </div>
                                 <p className="tarjeta-pedido__meta">
-                                    {formatearFecha(pedido.fecha)}. {ETIQUETAS_ENTREGA[pedido.tipoEntrega]}.
+                                    <span>{formatearFecha(pedido.fecha)}</span>
+                                    <span>{ETIQUETAS_ENTREGA[pedido.tipoEntrega]}</span>
                                 </p>
+                                <SeguimientoPedido estado={pedido.estado} tipoEntrega={pedido.tipoEntrega} />
                                 <ul className="tarjeta-pedido__items">
                                     {pedido.items.map((item) => (
                                         <li key={item.id}>
@@ -77,17 +91,28 @@ export default function MisPedidosPage() {
                                 </ul>
                                 <div className="tarjeta-pedido__pie">
                                     <p className="tarjeta-pedido__total">{formatearPrecio(pedido.total)}</p>
-                                    {pedido.estado === "PENDIENTE" && (
+                                    <div className="tarjeta-pedido__acciones">
                                         <Button
-                                            variante="peligro"
+                                            variante="secundario"
                                             tamano="chico"
-                                            icono="cerrar"
-                                            cargando={cancelando === pedido.id}
-                                            onClick={() => cancelar(pedido)}
+                                            icono="mas"
+                                            cargando={pidiendoId === pedido.id}
+                                            onClick={() => pedirDeNuevo(pedido)}
                                         >
-                                            Cancelar pedido
+                                            Pedir de nuevo
                                         </Button>
-                                    )}
+                                        {pedido.estado === "PENDIENTE" && (
+                                            <Button
+                                                variante="peligro"
+                                                tamano="chico"
+                                                icono="cerrar"
+                                                cargando={cancelando === pedido.id}
+                                                onClick={() => cancelar(pedido)}
+                                            >
+                                                Cancelar pedido
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
                             </li>
                         ))}

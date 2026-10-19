@@ -10,6 +10,7 @@ import QuantityStepper from "../components/ui/QuantityStepper";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
+import { useNumeroAnimado } from "../hooks/useNumeroAnimado";
 import { useTitulo } from "../hooks/useTitulo";
 import { confirmarPedido } from "../services/pedidosService";
 import { formatearPrecio } from "../utils/format";
@@ -33,6 +34,7 @@ export default function PedidoPage() {
     const toast = useToast();
     const { items, total, cambiarCantidad, quitar, vaciar } = useCart();
     const { estaLogueado, usuario } = useAuth();
+    const totalAnimado = useNumeroAnimado(total);
 
     const [datos, setDatos] = useState({
         tipoEntrega: "RETIRO",
@@ -134,7 +136,7 @@ export default function PedidoPage() {
                         </h2>
                         <p className="pedido__total">
                             <span>Total</span>
-                            <strong>{formatearPrecio(total)}</strong>
+                            <strong>{formatearPrecio(totalAnimado)}</strong>
                         </p>
 
                         {estaLogueado ? (

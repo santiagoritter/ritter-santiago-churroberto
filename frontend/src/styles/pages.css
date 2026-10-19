@@ -45,6 +45,7 @@
 
 /* ---------- Menú completo ---------- */
 .filtros {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
@@ -602,4 +603,198 @@
     50% {
         transform: translateY(-0.8rem) rotate(14deg);
     }
+}
+
+/* ---------- Buscar, ordenar y contar ---------- */
+.herramientas {
+    display: grid;
+    gap: 1.2rem;
+    align-items: end;
+}
+
+.herramientas__controles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 1rem;
+}
+
+.herramientas__conteo {
+    margin-block: 0.8rem 0;
+    font-weight: 800;
+}
+
+.herramientas--admin {
+    grid-template-columns: minmax(0, 22rem) auto;
+    justify-content: space-between;
+}
+
+.herramientas--admin .herramientas__conteo {
+    margin: 0 0 0.9rem;
+}
+
+.filtro__cuenta {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    margin-left: 0.5rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: var(--manteca);
+    color: var(--cacao);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Seguimiento del pedido ---------- */
+.seguimiento {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--pasos), minmax(0, 1fr));
+    gap: 0.4rem;
+    margin-block: 0.4rem 0.2rem;
+    padding: 0;
+    list-style: none;
+}
+
+/* La línea que une los pasos pasa por detrás de las marcas. */
+.seguimiento::before {
+    content: "";
+    position: absolute;
+    top: 1.1rem;
+    right: calc(50% / var(--pasos));
+    left: calc(50% / var(--pasos));
+    height: 4px;
+    border-radius: 4px;
+    background: rgb(43 18 11 / 0.18);
+}
+
+.seguimiento__paso {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    text-align: center;
+}
+
+.seguimiento__marca {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 3px solid var(--cacao);
+    border-radius: 50%;
+    background: var(--azucar);
+    color: var(--cacao);
+    opacity: 0.55;
+    transition:
+        transform 0.5s var(--ease-pop),
+        background-color 0.4s ease,
+        opacity 0.4s ease;
+}
+
+.seguimiento__paso--hecho .seguimiento__marca {
+    background: var(--exito);
+    border-color: var(--exito);
+    color: var(--azucar);
+    opacity: 1;
+}
+
+.seguimiento__paso--actual .seguimiento__marca {
+    background: var(--manteca);
+    opacity: 1;
+    transform: scale(1.18);
+    animation: latido-paso 1.8s ease-in-out infinite;
+}
+
+.seguimiento__rotulo {
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.15;
+    opacity: 0.7;
+}
+
+.seguimiento__paso--actual .seguimiento__rotulo,
+.seguimiento__paso--hecho .seguimiento__rotulo {
+    font-weight: 800;
+    opacity: 1;
+}
+
+.seguimiento--cancelado {
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radio-campo);
+    background: var(--error-fondo);
+    color: var(--error);
+    font-weight: 800;
+}
+
+@keyframes latido-paso {
+    50% {
+        transform: scale(1.3) rotate(8deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .seguimiento__paso--actual .seguimiento__marca {
+        animation: none;
+    }
+}
+
+@media (max-width: 36rem) {
+    .herramientas--admin {
+        grid-template-columns: 1fr;
+    }
+
+    .seguimiento__rotulo {
+        font-size: 0.72rem;
+    }
+}
+
+.tarjeta-pedido__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+}
+
+.seguimiento__rotulo {
+    overflow-wrap: normal;
+}
+
+/* En el celular las opciones van en una sola fila que se desliza, con los bordes difuminados. */
+@media (max-width: 36rem) {
+    .filtros {
+        flex-wrap: nowrap;
+        margin-inline: calc(var(--gutter) * -1);
+        padding: 0.5rem var(--gutter);
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        mask-image: linear-gradient(
+            90deg,
+            transparent,
+            #000 var(--gutter),
+            #000 calc(100% - var(--gutter)),
+            transparent
+        );
+    }
+
+    .filtros::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filtro {
+        flex: none;
+        scroll-snap-align: center;
+    }
+}
+
+/* El dibujo del producto que viaja de la lista al detalle (y de vuelta) */
+::view-transition-group(*) {
+    animation-duration: 0.7s;
+    animation-timing-function: var(--ease-salida);
+}
+
+::view-transition-group(root),
+::view-transition-group(cabecera) {
+    animation-duration: 0.25s;
 }

@@ -8,8 +8,11 @@ export const volarAlCarrito = (origen) => {
 
     const desde = origen.getBoundingClientRect();
     const hasta = destino.getBoundingClientRect();
+    // Si la cabecera está escondida, el vuelo apunta a donde va a estar el botón cuando reaparezca.
+    const isla = destino.closest(".cabecera__isla");
+    const escondidaPor = isla ? new DOMMatrix(getComputedStyle(isla).transform).m42 : 0;
     const dx = hasta.left + hasta.width / 2 - (desde.left + desde.width / 2);
-    const dy = hasta.top + hasta.height / 2 - (desde.top + desde.height / 2);
+    const dy = hasta.top - escondidaPor + hasta.height / 2 - (desde.top + desde.height / 2);
 
     const copia = origen.cloneNode(true);
     Object.assign(copia.style, {
@@ -21,7 +24,8 @@ export const volarAlCarrito = (origen) => {
         margin: "0",
         zIndex: "90",
         pointerEvents: "none",
-        transformOrigin: "center"
+        transformOrigin: "center",
+        viewTransitionName: "none"
     });
     copia.setAttribute("aria-hidden", "true");
     document.body.appendChild(copia);

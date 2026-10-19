@@ -33,7 +33,7 @@ export default function Hero({ local, sinWebGL }) {
                     </Reveal>
                     <Reveal className="hero__acciones" retraso={0.7}>
                         <Magnetico>
-                            <Button to="/menu" tamano="grande" iconoDespues="flecha">
+                            <Button to="/menu" tamano="grande" iconoDespues="flecha" data-churro>
                                 Pedir una docena
                             </Button>
                         </Magnetico>

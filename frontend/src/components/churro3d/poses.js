@@ -2,7 +2,15 @@
 // x e y van de -1 a 1 sobre la mitad de la pantalla; escala es relativa al tamaño que entra en el ancho.
 export const estadoChurro = {
     pose: "hero",
-    corte: 0
+    corte: 0,
+    // Cada vez que sube, el churro da una vuelta extra y "salta" (por ejemplo al sumar algo al pedido).
+    impulso: 0,
+    // Vale 1 mientras el mouse o el teclado están sobre un botón importante.
+    entusiasmo: 0
+};
+
+export const reaccionarChurro = () => {
+    estadoChurro.impulso += 1;
 };
 
 const ESCRITORIO = {

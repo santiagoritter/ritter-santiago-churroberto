@@ -4,6 +4,9 @@ import { velocidadScroll } from "../../utils/smoothScroll";
 import { prefiereMenosMovimiento } from "../../utils/motion";
 import Estrella from "../ui/Estrella";
 
+// La cinta nunca corre más de 2,5 veces su velocidad normal, aunque el scroll vaya muy rápido.
+const ACELERACION_MAXIMA = 1.5;
+
 // Cinta de frases que corre sola y se acelera con la velocidad del scroll.
 export default function Marquee({ frases, inversa = false, duracion = 36, className = "" }) {
     const pista = useRef(null);
@@ -15,7 +18,7 @@ export default function Marquee({ frases, inversa = false, duracion = 36, classN
 
         let actual = 1;
         const alTick = () => {
-            const objetivo = 1 + Math.min(Math.abs(velocidadScroll()) * 0.35, 6);
+            const objetivo = 1 + Math.min(Math.abs(velocidadScroll()) * 0.12, ACELERACION_MAXIMA);
             actual += (objetivo - actual) * 0.08;
             animacion.playbackRate = actual;
         };

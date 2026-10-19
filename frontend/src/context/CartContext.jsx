@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { guardarLocal, leerLocal } from "../utils/storage";
 
 const CartContext = createContext(null);
@@ -48,6 +48,9 @@ const reducir = (items, accion) => {
 
 export function CartProvider({ children }) {
     const [items, despachar] = useReducer(reducir, null, () => leerLocal(CLAVE_CARRITO, []));
+    const [cajonAbierto, setCajonAbierto] = useState(false);
+    const abrirCajon = useCallback(() => setCajonAbierto(true), []);
+    const cerrarCajon = useCallback(() => setCajonAbierto(false), []);
 
     useEffect(() => {
         guardarLocal(CLAVE_CARRITO, items);
@@ -61,9 +64,12 @@ export function CartProvider({ children }) {
             agregar: (producto, cantidad = 1) => despachar({ tipo: "agregar", producto, cantidad }),
             cambiarCantidad: (productoId, cantidad) => despachar({ tipo: "cantidad", productoId, cantidad }),
             quitar: (productoId) => despachar({ tipo: "quitar", productoId }),
-            vaciar: () => despachar({ tipo: "vaciar" })
+            vaciar: () => despachar({ tipo: "vaciar" }),
+            cajonAbierto,
+            abrirCajon,
+            cerrarCajon
         }),
-        [items]
+        [items, cajonAbierto, abrirCajon, cerrarCajon]
     );
 
     return <CartContext value={valor}>{children}</CartContext>;

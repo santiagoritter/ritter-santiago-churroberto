@@ -1,22 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import { useDireccionScroll } from "../../hooks/useDireccionScroll";
 import Estrella from "../ui/Estrella";
 import Icon from "../ui/Icon";
 
 export default function Header() {
-    const { cantidadTotal } = useCart();
+    const { cantidadTotal, abrirCajon } = useCart();
     const { estaLogueado, esAdmin, cerrarSesion } = useAuth();
     const [abierto, setAbierto] = useState(false);
+    const { oculta, compacta } = useDireccionScroll();
     const { pathname, hash } = useLocation();
+
+    // Al sumar algo, la cabecera reaparece un rato para que se vea a dónde fue.
+    const [recienSumado, setRecienSumado] = useState(false);
+    const cantidadAnterior = useRef(cantidadTotal);
+    useEffect(() => {
+        const subio = cantidadTotal > cantidadAnterior.current;
+        cantidadAnterior.current = cantidadTotal;
+        if (!subio) return undefined;
+        setRecienSumado(true);
+        const espera = setTimeout(() => setRecienSumado(false), 2600);
+        return () => clearTimeout(espera);
+    }, [cantidadTotal]);
 
     // El menú del celular se cierra al navegar.
     useEffect(() => setAbierto(false), [pathname, hash]);
 
     return (
         <header className="cabecera">
-            <nav className="cabecera__isla" aria-label="Principal">
+            <nav
+                className="cabecera__isla"
+                aria-label="Principal"
+                data-oculta={oculta && !abierto && !recienSumado}
+                data-compacta={compacta}
+            >
                 <Link to="/" className="logo" viewTransition aria-label="Churroberto, ir al inicio">
                     <span className="logo__marca">
                         <Estrella tamano={26} />
@@ -69,17 +88,20 @@ export default function Header() {
                 </ul>
 
                 <div className="cabecera__acciones">
-                    <Link
-                        to="/pedido"
+                    <button
+                        type="button"
                         className="carrito-boton"
-                        viewTransition
+                        onClick={abrirCajon}
+                        aria-haspopup="dialog"
                         aria-label={`Mi pedido, ${cantidadTotal} ${cantidadTotal === 1 ? "producto" : "productos"}`}
                     >
                         <Icon nombre="carrito" />
-                        <span className="carrito-boton__cuenta" key={cantidadTotal} aria-hidden="true">
-                            {cantidadTotal}
-                        </span>
-                    </Link>
+                        {cantidadTotal > 0 && (
+                            <span className="carrito-boton__cuenta" key={cantidadTotal} aria-hidden="true">
+                                {cantidadTotal}
+                            </span>
+                        )}
+                    </button>
                     <button
                         type="button"
                         className="cabecera__menu"

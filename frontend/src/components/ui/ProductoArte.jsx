@@ -126,7 +126,7 @@ function Factura() {
     );
 }
 
-export default function ProductoArte({ nombre = "", categoria = "", titulo }) {
+export default function ProductoArte({ nombre = "", categoria = "", titulo, nombreTransicion }) {
     const texto = `${nombre} ${categoria}`.toLowerCase();
     const relleno = texto.includes("chocolate") ? RELLENOS.chocolate : RELLENOS.dulce;
     const esFactura = texto.includes("factura");
@@ -154,6 +154,8 @@ export default function ProductoArte({ nombre = "", categoria = "", titulo }) {
             aria-label={titulo}
             aria-hidden={titulo ? undefined : true}
             focusable="false"
+            // Mismo nombre en la ficha y en el detalle: el dibujo viaja de una pantalla a la otra.
+            style={nombreTransicion ? { viewTransitionName: nombreTransicion } : undefined}
         >
             {dibujo}
         </svg>

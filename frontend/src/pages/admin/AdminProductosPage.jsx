@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "../../components/ui/Button";
 import { Cargando, EstadoError, EstadoVacio } from "../../components/ui/Estados";
+import { Input } from "../../components/ui/Field";
+import Insignia from "../../components/ui/Insignia";
 import { useConfirm } from "../../context/ConfirmContext";
 import { useToast } from "../../context/ToastContext";
 import { useAsync } from "../../hooks/useAsync";
@@ -14,11 +16,18 @@ export default function AdminProductosPage() {
     const toast = useToast();
     const confirmar = useConfirm();
     const [eliminando, setEliminando] = useState(null);
+    const [busqueda, setBusqueda] = useState("");
 
     const { datos, error, cargando, recargar } = useAsync(async (signal) => {
         const [productos, categorias] = await Promise.all([listarProductos({ signal }), listarCategorias({ signal })]);
         return { productos, categorias };
     });
+
+    const visibles = useMemo(() => {
+        const texto = busqueda.trim().toLowerCase();
+        if (!datos || !texto) return datos?.productos ?? [];
+        return datos.productos.filter((producto) => producto.nombre.toLowerCase().includes(texto));
+    }, [datos, busqueda]);
 
     const eliminar = async (producto) => {
         const acepto = await confirmar({
@@ -67,6 +76,26 @@ export default function AdminProductosPage() {
             )}
 
             {datos?.productos.length > 0 && (
+                <div className="herramientas herramientas--admin">
+                    <Input
+                        etiqueta="Buscar un producto"
+                        type="search"
+                        autoComplete="off"
+                        spellCheck={false}
+                        value={busqueda}
+                        onChange={(evento) => setBusqueda(evento.target.value)}
+                    />
+                    <p className="herramientas__conteo" role="status">
+                        {visibles.length} de {datos.productos.length}
+                    </p>
+                </div>
+            )}
+
+            {datos?.productos.length > 0 && visibles.length === 0 && (
+                <EstadoVacio titulo="Ningún producto coincide" nivel={3} />
+            )}
+
+            {visibles.length > 0 && (
                 <div className="tabla-envoltorio">
                     <table className="tabla">
                         <caption className="visualmente-oculto">Productos del menú</caption>
@@ -86,7 +115,7 @@ export default function AdminProductosPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {datos.productos.map((producto) => (
+                            {visibles.map((producto) => (
                                 <tr key={producto.id}>
                                     <th scope="row">{producto.nombre}</th>
                                     <td>
@@ -94,7 +123,13 @@ export default function AdminProductosPage() {
                                             "Sin categoría"}
                                     </td>
                                     <td className="tabla__numero">{formatearPrecio(producto.precio)}</td>
-                                    <td className="tabla__numero">{producto.stock}</td>
+                                    <td className="tabla__numero">
+                                        {producto.stock}
+                                        {producto.stock === 0 && <Insignia tono="error">Agotado</Insignia>}
+                                        {producto.stock > 0 && producto.stock <= 10 && (
+                                            <Insignia tono="aviso">Poco stock</Insignia>
+                                        )}
+                                    </td>
                                     <td className="tabla__acciones">
                                         <Button
                                             to={`/admin/productos/${producto.id}/editar`}

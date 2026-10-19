@@ -24,6 +24,24 @@
     background: var(--azucar);
     box-shadow: var(--sombra-suave);
     pointer-events: auto;
+    transition:
+        transform 0.55s var(--ease-salida),
+        padding 0.35s var(--ease-salida),
+        box-shadow 0.35s ease;
+}
+
+/* Al bajar se esconde; al subir (o al navegar con teclado) reaparece */
+.cabecera__isla[data-oculta="true"] {
+    transform: translateY(-150%);
+}
+
+.cabecera__isla:focus-within {
+    transform: none;
+}
+
+.cabecera__isla[data-compacta="true"] {
+    padding-block: 0.3rem;
+    box-shadow: 0 14px 28px -14px rgb(43 18 11 / 0.55);
 }
 
 .logo {

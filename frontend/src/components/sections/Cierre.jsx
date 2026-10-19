@@ -15,7 +15,7 @@ export default function Cierre() {
                 <SplitText como="h2" id="titulo-cierre" className="cierre__titulo" texto="¿Una|docena?" />
                 <Reveal className="cierre__accion" retraso={0.3}>
                     <Magnetico fuerza={0.45}>
-                        <Button to="/menu" tamano="grande" variante="claro" iconoDespues="flecha">
+                        <Button to="/menu" tamano="grande" variante="claro" iconoDespues="flecha" data-churro>
                             Pedir ahora
                         </Button>
                     </Magnetico>

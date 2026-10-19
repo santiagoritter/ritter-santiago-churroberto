@@ -1,10 +1,14 @@
+import { useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
+import SeguimientoPedido from "../components/pedidos/SeguimientoPedido";
 import Estrella from "../components/ui/Estrella";
 import SplitText from "../components/effects/SplitText";
 import Button from "../components/ui/Button";
 import { Cargando, EstadoError } from "../components/ui/Estados";
 import Insignia from "../components/ui/Insignia";
 import { useAsync } from "../hooks/useAsync";
+import { useAvisoDeEstado } from "../hooks/useAvisoDeEstado";
+import { useRefrescoPeriodico } from "../hooks/useRefrescoPeriodico";
 import { useTitulo } from "../hooks/useTitulo";
 import { obtenerPedido } from "../services/pedidosService";
 import {
@@ -20,6 +24,13 @@ export default function PedidoConfirmadoPage() {
     useTitulo("Pedido confirmado");
     const { id } = useParams();
     const { datos: pedido, error, cargando, recargar } = useAsync((signal) => obtenerPedido(id, { signal }), [id]);
+
+    // Si el pedido sigue en curso, se mira cada tanto cómo va. useAvisoDeEstado espera una lista.
+    const enCurso = Boolean(pedido) && !["ENTREGADO", "CANCELADO"].includes(pedido.estado);
+    const refrescar = useCallback(() => recargar(), [recargar]);
+    useRefrescoPeriodico(refrescar, { activo: enCurso });
+    const comoLista = useMemo(() => (pedido ? [pedido] : null), [pedido]);
+    useAvisoDeEstado(comoLista);
 
     if (cargando) return <Cargando etiqueta="Cargando tu pedido" />;
 
@@ -47,6 +58,8 @@ export default function PedidoConfirmadoPage() {
                 </div>
                 <SplitText como="h1" id="titulo-confirmado" className="pagina__titulo" texto="¡Pedido en|marcha!" />
                 <p className="pagina__bajada">Anotamos tu pedido número {pedido.id}. El pago se hace al recibirlo.</p>
+
+                <SeguimientoPedido estado={pedido.estado} tipoEntrega={pedido.tipoEntrega} />
 
                 <div className="comprobante sticker">
                     <p className="comprobante__fila">

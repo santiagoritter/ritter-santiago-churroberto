@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Button from "../components/ui/Button";
 import { Cargando, EstadoError, EstadoVacio } from "../components/ui/Estados";
 import FichaProducto from "../components/productos/FichaProducto";
@@ -12,20 +12,26 @@ import { useTitulo } from "../hooks/useTitulo";
 import { listarCategorias } from "../services/categoriasService";
 import { listarProductos, obtenerProducto } from "../services/productosService";
 import { formatearPrecio } from "../utils/format";
+import { chispas } from "../utils/chispas";
 import { volarAlCarrito } from "../utils/volarAlCarrito";
+import { reaccionarChurro } from "../components/churro3d/poses";
 
 export default function ProductoPage() {
     const { id } = useParams();
-    const { agregar, items } = useCart();
+    // Si se llegó desde el menú, ya se conoce el producto: se muestra al instante (y el dibujo viaja de la lista
+    // al detalle) mientras se pide la versión actualizada a la API.
+    const { state } = useLocation();
+    const previo = state?.producto?.id === Number(id) ? state : null;
+    const { agregar, items, abrirCajon } = useCart();
     const toast = useToast();
     const [cantidad, setCantidad] = useState(1);
 
     const producto = useAsync((signal) => obtenerProducto(id, { signal }), [id]);
     const categorias = useAsync((signal) => listarCategorias({ signal }));
     const todos = useAsync((signal) => listarProductos({ signal }));
-    useTitulo(producto.datos?.nombre ?? "Producto");
+    useTitulo(producto.datos?.nombre ?? previo?.producto.nombre ?? "Producto");
 
-    if (producto.cargando) return <Cargando etiqueta="Cargando el producto" />;
+    if (producto.cargando && !previo) return <Cargando etiqueta="Cargando el producto" />;
 
     if (producto.error?.status === 404 || producto.error?.status === 400) {
         return (
@@ -52,16 +58,21 @@ export default function ProductoPage() {
         );
     }
 
-    const datos = producto.datos;
-    const categoria = categorias.datos?.find((c) => c.id === datos.categoriaId)?.nombre ?? "";
+    const datos = producto.datos ?? previo.producto;
+    const categoria = categorias.datos?.find((c) => c.id === datos.categoriaId)?.nombre ?? previo?.categoria ?? "";
     const enPedido = items.find((item) => item.productoId === datos.id)?.cantidad ?? 0;
     const disponible = Math.max(0, datos.stock - enPedido);
     const relacionados = (todos.datos ?? []).filter((otro) => otro.id !== datos.id).slice(0, 3);
 
-    const sumar = () => {
+    const sumar = (evento) => {
         volarAlCarrito(document.querySelector(".detalle__arte .producto-arte"));
+        chispas(evento.currentTarget);
+        reaccionarChurro();
         agregar(datos, cantidad);
-        toast.exito(`Sumaste ${cantidad} ${cantidad === 1 ? "unidad" : "unidades"} de ${datos.nombre}.`);
+        toast.exito(`Sumaste ${cantidad} ${cantidad === 1 ? "unidad" : "unidades"} de ${datos.nombre}.`, {
+            texto: "Ver pedido",
+            alHacer: abrirCajon
+        });
         setCantidad(1);
     };
 
@@ -77,6 +88,7 @@ export default function ProductoPage() {
                             nombre={datos.nombre}
                             categoria={categoria}
                             titulo={`Dibujo de ${datos.nombre}`}
+                            nombreTransicion={`arte-${datos.id}`}
                         />
                     </div>
                     <div className="detalle__info">

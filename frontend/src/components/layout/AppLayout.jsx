@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useSmoothScroll } from "../../hooks/useSmoothScroll";
 import { irA, irArriba } from "../../utils/smoothScroll";
+import CarritoLateral from "../carrito/CarritoLateral";
 import CustomCursor from "../effects/CustomCursor";
 import Preloader from "../effects/Preloader";
 import ProgresoScroll from "../effects/ProgresoScroll";
@@ -48,6 +49,7 @@ export default function AppLayout() {
             <CustomCursor />
             <ProgresoScroll />
             <Header />
+            <CarritoLateral />
             <main id="contenido" ref={principal} tabIndex={-1}>
                 <Outlet />
             </main>

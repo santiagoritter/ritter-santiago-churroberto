@@ -21,7 +21,7 @@ function Aviso({ aviso, alCerrar }) {
 
     return (
         <div
-            className={`aviso aviso--${aviso.tipo}`}
+            className={`aviso aviso--${aviso.tipo} ${aviso.saliendo ? "aviso--saliendo" : ""}`}
             role={aviso.tipo === "error" ? "alert" : "status"}
             onMouseEnter={pausar}
             onMouseLeave={programar}
@@ -31,7 +31,21 @@ function Aviso({ aviso, alCerrar }) {
             <span className="aviso__icono">
                 <Icon nombre={ICONOS[aviso.tipo]} tamano={20} />
             </span>
-            <p className="aviso__mensaje">{aviso.mensaje}</p>
+            <div className="aviso__texto">
+                <p className="aviso__mensaje">{aviso.mensaje}</p>
+                {aviso.accion && (
+                    <button
+                        type="button"
+                        className="aviso__accion"
+                        onClick={() => {
+                            aviso.accion.alHacer();
+                            alCerrar(aviso.id);
+                        }}
+                    >
+                        {aviso.accion.texto}
+                    </button>
+                )}
+            </div>
             <button
                 type="button"
                 className="aviso__cerrar"

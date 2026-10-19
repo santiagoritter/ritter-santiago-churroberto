@@ -1,6 +1,6 @@
 import { Canvas, useThree } from "@react-three/fiber";
-import { useEffect } from "react";
-import { Environment, Lightformer } from "@react-three/drei";
+import { useEffect, useState } from "react";
+import { Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { useEsMovil, useMenosMovimiento } from "../../hooks/useMediaQuery";
 import Churro from "./Churro";
 
@@ -25,18 +25,27 @@ function VigilanteDeContexto({ alPerder }) {
 export default function ChurroCanvas({ alPerderContexto }) {
     const esMovil = useEsMovil();
     const menosMovimiento = useMenosMovimiento();
+    // Resolución del lienzo: arranca alta y baja sola si el equipo no mantiene los cuadros por segundo.
+    const maxima = Math.min(esMovil ? 1.5 : 1.75, window.devicePixelRatio || 1);
+    const [resolucion, setResolucion] = useState(maxima);
 
     return (
         <div className="churro-lienzo" aria-hidden="true">
             <Canvas
                 flat
-                dpr={esMovil ? [1, 1.5] : [1, 1.75]}
+                dpr={resolucion}
                 camera={{ position: [0, 0, 7.5], fov: 32 }}
-                gl={{ antialias: true, alpha: true, stencil: true, powerPreference: "high-performance" }}
+                gl={{ antialias: true, alpha: true, stencil: true, powerPreference: "default" }}
                 onCreated={({ gl }) => {
                     gl.localClippingEnabled = true;
                 }}
             >
+                <PerformanceMonitor
+                    flipflops={3}
+                    onDecline={() => setResolucion((actual) => Math.max(1, actual - 0.35))}
+                    onIncline={() => setResolucion((actual) => Math.min(maxima, actual + 0.25))}
+                    onFallback={() => setResolucion(1)}
+                />
                 <VigilanteDeContexto alPerder={alPerderContexto} />
                 <ambientLight intensity={0.75} />
                 <directionalLight position={[3, 4, 5]} intensity={2.4} color="#fff1d4" />
