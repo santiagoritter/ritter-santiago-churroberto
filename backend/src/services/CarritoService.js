@@ -21,7 +21,13 @@ class CarritoService {
             existente.cantidad = cantidadTotal;
             existente.precioUnitario = producto.precio;
         } else {
-            const item = new ItemCarrito(CarritoRepository.nextItemId(), carrito.id, productoId, cantidad, producto.precio);
+            const item = new ItemCarrito(
+                CarritoRepository.nextItemId(),
+                carrito.id,
+                productoId,
+                cantidad,
+                producto.precio
+            );
             carrito.items.push(item);
         }
         return this.#armarVista(carrito);

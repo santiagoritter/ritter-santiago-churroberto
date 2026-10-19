@@ -40,7 +40,9 @@ describe("Cuentas y sesión", () => {
     });
 
     it("inicia sesión y rechaza credenciales incorrectas con el mismo mensaje", async () => {
-        const correcta = await api.post("/auth/login").send({ email: "ana@example.com", contrasena: "una-clave-larga" });
+        const correcta = await api
+            .post("/auth/login")
+            .send({ email: "ana@example.com", contrasena: "una-clave-larga" });
         assert.equal(correcta.status, 200);
 
         const claveMala = await api.post("/auth/login").send({ email: "ana@example.com", contrasena: "otra" });

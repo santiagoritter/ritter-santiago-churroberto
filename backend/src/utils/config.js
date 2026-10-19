@@ -27,7 +27,7 @@ export const config = Object.freeze({
     bcryptRounds: Number(process.env.BCRYPT_ROUNDS) || 10,
     // Detrás de un proxy (hosting) hay que indicar cuántos saltos confiar para ver la IP real.
     trustProxy: process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) || 1 : false,
-    corsOrigins: parseOrigins(process.env.CORS_ORIGIN || "http://localhost:5173")
+    corsOrigins: parseOrigins(process.env.CORS_ORIGIN || "http://localhost:5173,http://127.0.0.1:5173")
 });
 
 export default config;

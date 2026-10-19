@@ -25,7 +25,17 @@ class AuthService {
         const hash = await hashearContrasena(datos.contrasena);
         const fecha = new Date().toISOString();
         const usuario = UsuarioRepository.save(
-            new Usuario(null, datos.nombre, datos.apellido, datos.email, datos.telefono, hash, datos.direccion, fecha, Roles.CLIENTE)
+            new Usuario(
+                null,
+                datos.nombre,
+                datos.apellido,
+                datos.email,
+                datos.telefono,
+                hash,
+                datos.direccion,
+                fecha,
+                Roles.CLIENTE
+            )
         );
         CarritoRepository.save(new Carrito(null, usuario.id, fecha, []));
         return armarSesion(usuario);

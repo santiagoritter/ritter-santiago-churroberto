@@ -8,28 +8,30 @@ related_targets: []
 # Surface brief: Home (landing con pedido)
 
 ## Scope and visitor mode
-Persuade. Ruta `/` del frontend de Churroberto. Es la puerta de entrada: muestra el churro, el menú real desde la API y lleva al pedido. Las pantallas de catálogo, carrito, login y admin heredan el mismo mundo visual.
+Persuade. Ruta `/` del frontend de Churroberto: la puerta de entrada que muestra el churro, el menú real desde la API y lleva al pedido. Las demás pantallas (menú, detalle, carrito, cuenta, admin) heredan el mismo mundo visual con menos espectáculo.
 
 ## Audience, job, action, proof, constraints
-- Audiencia: vecinos de Villa Urquiza que quieren churros en casa (envío) o retirar en el local, desde el celular.
-- Trabajo: entender qué hace distinto a Churroberto y pedir una docena en pocos pasos.
-- Acción primaria: "Pedir una docena", visible en la primera pantalla y que lleva al catálogo/carrito.
-- Prueba disponible: dirección, horarios, que se hacen a la vista y con relleno de dulce de leche o chocolate, tres reseñas públicas. No hay fotos, precios ni teléfono: no se inventan. Todo menú y precio es de ejemplo y se rotula como tal.
-- Restricciones: React + Vite, datos desde la API (nada de negocio escrito en componentes), accesibilidad básica, `prefers-reduced-motion`, contraste AA, mobile primero.
+- Audiencia: vecinos de Villa Urquiza que quieren churros en casa o para retirar, desde el celular.
+- Trabajo: entender que acá el churro se hace a la vista y con relleno, y pedir una docena en pocos pasos.
+- Acción primaria: "Pedir una docena", visible en la primera pantalla.
+- Prueba disponible: dirección, horarios, que se hacen a la vista con relleno de dulce de leche o chocolate, tres reseñas públicas. Sin fotos, precios ni teléfono reales: no se inventan; el menú es de ejemplo y se avisa en el pie.
+- Restricciones: React + Vite, datos desde la API, accesibilidad básica, `prefers-reduced-motion`, contraste AA, mobile primero, el efecto 3D no puede bloquear el contenido.
+
+## Pinned by the user
+Juguetón y moderno, nivel Awwwards, muchas animaciones y efectos de scroll, churro 3D que rota al scrollear (combinado según la sección). No debe parecer hecho por una IA. Se descarta el "plano de patente".
 
 ## Chosen direction and memorable moment
-Plano de patente. Momento memorable: el churro nace como línea y se rellena. Al scrollear, el contorno dibujado se transforma en el churro 3D que gira y muestra el corte con el relleno.
+Un pliego de stickers de kiosco. Momento memorable: el churro 3D es el sticker principal, con borde troquelado blanco, que rueda y gira mientras bajás, se frena en "Cómo se hace" y se abre en corte para mostrar el relleno.
 
 ## Direction contract
-THESIS: El churro presentado como una invención patentada: una lámina técnica que se dibuja y se vuelve objeto. Rechaza el hero genérico de churrería (foto, titular cálido y botón) y la lámina técnica fría (azul de plano, mono pequeño en mayúsculas).
-OWN-WORLD: Toda la superficie es una lámina color fritura (#E98A1C) con tinta marrón aceite (#2A150C), azúcar (#FFF3DC) para resaltes y canela (#8B4A21) para sombreados. Línea de estilógrafo con trazo vivo, cotas, flechas de llamada, sellos de patente, cajetín con título. Tipografía técnica con carácter (no de la lista de defectos). Foco, cursor, progreso y avisos se dibujan como instrumentos del plano.
-STORY: El visitante entiende en segundos que acá el churro se hace a la vista y con relleno, ve de qué está hecho en el corte, cree en el oficio por el detalle técnico y pide una docena.
-FIRST VIEWPORT: Lámina completa. A la izquierda y centro, el churro en axonometría de línea (se dibuja con trazo animado) con cotas y el corte en estrella; a la derecha el cajetín "Churroberto N.° 1" con el nombre, las horas de apertura y el sello "Pedir una docena" como acción principal. El churro 3D toma el lugar del dibujo al primer scroll.
-FORM: Plano de patente, candidato 7 de mi lista de 7, seed:4e3f71a0bd3d2644. Bloques adoptados de otros mundos: un solo reloj de scroll para CSS, GSAP y Three; compromiso total con el ambiente (cursor, foco, avisos dibujados); menú legible en celular con precio grande.
+THESIS: La churrería como una hoja de calcomanías de kiosco: colores planos, bordes troquelados blancos y letras gordas como masa recién salida de la manga. El churro 3D es el sticker que se despega y gira al scrollear. Rechaza la lámina técnica, el crema con terracota y las filas de tarjetas iguales.
+OWN-WORLD: Campos de color plano a sección: celeste #5BC0F8, manteca #FFD84A, frutilla #FF7DB5 y chocolate #3A1A10; tinta cacao #2B120B y azúcar blanca; el churro en caramelo dorado. Bagel Fat One para títulos y Hanken Grotesk para texto. Stickers con borde blanco troquelado, inclinación leve y sombra suave; bordes de sección festoneados como un toldo; sellos circulares que giran con el scroll.
+STORY: El visitante ve un churro enorme y simpático, entiende que se hace a la vista y con relleno, sigue el proceso mientras el churro se abre, confía por las reseñas y el local, y pide una docena.
+FIRST VIEWPORT: Campo celeste. A la izquierda el titular en tres líneas gordas ("Churros, hechos, a la vista") y el botón pastilla "Pedir una docena" con "Ver el menú"; a la derecha el churro 3D grande con borde blanco rodando, un sello circular girando y dos stickers sueltos; abajo a la izquierda una pastilla "Abierto ahora".
+FORM: Mundo fijado por el usuario con sus palabras, sin sorteo. seed: none (user-pinned direction)
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
 ## Unresolved decisions
-- Tipografías exactas y escala.
-- Si el cursor propio se activa solo con puntero fino.
-- Mapa numerado del menú: cuántas fichas por fila en celular.
+- Si el churro lleva cara (mascota) o queda como objeto.
 - Qué datos reales aporta el dueño (menú, precios, teléfono, fotos).
+- Teléfono/WhatsApp para el botón de contacto.

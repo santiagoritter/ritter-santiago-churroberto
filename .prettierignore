@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+.claude
+.agents
+.impeccable
+docs/boceto
+package-lock.json

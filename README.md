@@ -15,21 +15,29 @@ ritter-santiago-churroberto/
 |---|---|---|
 | 1 | Repositorio, diagrama de clases y modelos del dominio | Hecha |
 | 2 | API con MVC, CRUD de productos, manejo central de errores | Hecha |
-| 3 | Frontend en React conectado a la API | En curso |
+| 3 | Frontend en React conectado a la API | Hecha |
 
-## Cómo correr el backend
+## Cómo correr el proyecto
 
-Requiere Node 20 o superior.
+Requiere Node 20 o superior. Se necesitan dos terminales: una para la API y otra para el sitio.
 
 ```bash
+# Terminal 1: API
 cd backend
 npm install
 cp .env.example .env     # opcional en desarrollo
 npm run dev              # http://localhost:3000
 npm test                 # tests de la API
+
+# Terminal 2: sitio
+cd frontend
+npm install
+npm run dev              # http://localhost:5173
 ```
 
 En desarrollo, si no hay `.env`, se crea un administrador con el email `admin@churroberto.com` y la contraseña `admin1234`. En producción `JWT_SECRET` y `ADMIN_PASSWORD` son obligatorias. Los datos viven en memoria: al reiniciar la API vuelven al estado inicial.
+
+Para entrar al panel del local: `http://localhost:5173/ingresar` con la cuenta administradora, y después "Administrar" en la cabecera.
 
 ## Datos de ejemplo
 
@@ -37,4 +45,4 @@ El local no publica su carta. Los **productos, precios y stock del menú son de 
 
 ## Diseño
 
-El boceto está en `docs/boceto/index.html` (ábrelo en el navegador). La dirección visual es un "plano de patente": láminas color fritura, cajetín, sellos y un churro 3D que cambia de pose según la sección mientras se hace scroll.
+La dirección visual es un pliego de stickers de kiosco: campos de color plano, bordes troquelados, letras gordas y un churro 3D que rueda, gira y se abre en corte mientras se hace scroll. Las capturas de referencia están en `docs/boceto/` y el sistema de diseño en `DESIGN.md`.

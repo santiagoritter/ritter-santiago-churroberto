@@ -1,0 +1,60 @@
+/* Pliego de stickers de kiosco: campos de color plano, tinta cacao y azúcar blanca. */
+:root {
+    color-scheme: light;
+
+    /* Campos de color (uno por sección) */
+    --celeste: #5bc0f8;
+    --manteca: #ffd84a;
+    --frutilla: #ff7db5;
+    --chocolate: #3a1a10;
+
+    /* Tintas */
+    --cacao: #2b120b;
+    --azucar: #ffffff;
+    --caramelo: #e3a03b;
+    --caramelo-oscuro: #b9731f;
+    --dulce: #c57a1e;
+
+    /* Estados */
+    --error: #b42a18;
+    --error-fondo: #ffe3de;
+    --exito: #0d6e47;
+    --exito-fondo: #d8f5e6;
+
+    /* Tipografía */
+    --fuente-titulo: "Bagel Fat One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+    --fuente-texto: "Hanken Grotesk Variable", "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --fs-chico: 0.875rem;
+    --fs-base: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+    --fs-medio: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem);
+    --fs-h3: clamp(1.4rem, 1.2rem + 1vw, 2rem);
+    --fs-h2: clamp(2.2rem, 1.4rem + 3.6vw, 4.5rem);
+    --fs-h1: clamp(3rem, 1.4rem + 6.4vw, 6rem);
+    --fs-gigante: clamp(7rem, 3rem + 24vw, 20rem);
+
+    /* Espacio, forma y profundidad */
+    --gutter: clamp(1rem, 4vw, 3rem);
+    --ancho: 1240px;
+    --radio-sticker: 28px;
+    --radio-campo: 16px;
+    --borde-sticker: 5px solid var(--azucar);
+    --sombra-sticker: 0 2px 0 rgb(43 18 11 / 0.1), 0 18px 30px -12px rgb(43 18 11 / 0.45);
+    --sombra-suave: 0 10px 24px -12px rgb(43 18 11 / 0.4);
+
+    /* Movimiento */
+    --ease-salida: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-pop: cubic-bezier(0.34, 1.35, 0.5, 1);
+
+    /* Capas */
+    --z-churro: 1;
+    --z-contenido: 2;
+    --z-header: 30;
+    --z-toast: 60;
+    --z-cursor: 80;
+    --z-precarga: 100;
+
+    /* Campo de color de la sección actual (lo usan los textos y botones que se adaptan) */
+    --campo: var(--celeste);
+    --sobre-campo: var(--cacao);
+}

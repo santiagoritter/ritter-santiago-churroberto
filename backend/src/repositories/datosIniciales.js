@@ -29,7 +29,9 @@ const REPOSITORIOS = [
 // reemplazarlos por los datos reales (o cargarlos desde el panel de administración).
 const cargarMenuDeEjemplo = () => {
     const churros = CategoriaRepository.save(new Categoria(null, "Churros", "Churros fritos al momento."));
-    const rellenos = CategoriaRepository.save(new Categoria(null, "Rellenos", "Rellenos de dulce de leche o chocolate."));
+    const rellenos = CategoriaRepository.save(
+        new Categoria(null, "Rellenos", "Rellenos de dulce de leche o chocolate.")
+    );
     const combos = CategoriaRepository.save(new Categoria(null, "Combos", "Docenas surtidas para compartir."));
     const facturas = CategoriaRepository.save(new Categoria(null, "Facturas", "Facturas de panadería."));
 
@@ -75,9 +77,17 @@ const cargarLocal = () => {
             -58.5038684,
             null,
             null,
+            // dias usa la numeración de JavaScript: 0 es domingo y 1 es lunes.
             [
-                { dias: "Martes a domingo", franjas: ["08:00 a 12:00", "15:30 a 19:00"] },
-                { dias: "Lunes", franjas: [] }
+                {
+                    etiqueta: "Martes a domingo",
+                    dias: [2, 3, 4, 5, 6, 0],
+                    franjas: [
+                        { desde: "08:00", hasta: "12:00" },
+                        { desde: "15:30", hasta: "19:00" }
+                    ]
+                },
+                { etiqueta: "Lunes", dias: [1], franjas: [] }
             ],
             "Churros artesanales hechos a la vista, con relleno de dulce de leche o chocolate."
         )

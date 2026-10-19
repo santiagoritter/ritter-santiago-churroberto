@@ -37,7 +37,7 @@ Local en José Pascual Tamborini 6186, Villa Urquiza / Villa Pueyrredón, Buenos
 
 ## Brand Commitments
 
-El nombre es "Churroberto" (Churrería Churroberto). Pedido explícito del usuario: estilo moderno cálido con mucha animación impactante al estilo de las webs premiadas en Awwwards, y un churro 3D que rota según la sección mientras se hace scroll. El resto de la identidad (logo, voz, colores) no existe todavía y se define en el diseño.
+El nombre es "Churroberto" (Churrería Churroberto). Dirección pedida por el usuario, que manda sobre cualquier sorteo de estilo: juguetón y moderno, con el nivel de animación y efectos de scroll de las webs premiadas en Awwwards (categoría CSS animations), y un churro 3D que rota mientras se hace scroll. El sitio **no debe parecer hecho por una IA**: se descartó el boceto "plano de patente" (frío y técnico). El resto de la identidad (logo, voz, colores) no existe todavía y se define en el diseño.
 
 ## Evidence on Hand
 
