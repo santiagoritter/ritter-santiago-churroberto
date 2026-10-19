@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SplitText from "../components/effects/SplitText";
 import Button from "../components/ui/Button";
 import { Cargando, EstadoError, EstadoVacio } from "../components/ui/Estados";
 import Insignia from "../components/ui/Insignia";
@@ -41,9 +42,7 @@ export default function MisPedidosPage() {
     return (
         <section className="pagina campo-celeste" aria-labelledby="titulo-mis-pedidos">
             <div className="pagina__interior">
-                <h1 className="pagina__titulo" id="titulo-mis-pedidos">
-                    Mis pedidos
-                </h1>
+                <SplitText como="h1" id="titulo-mis-pedidos" className="pagina__titulo" texto="Mis pedidos" />
 
                 {cargando && <Cargando etiqueta="Cargando tus pedidos" />}
                 {error && <EstadoError mensaje={error.message} alReintentar={recargar} />}

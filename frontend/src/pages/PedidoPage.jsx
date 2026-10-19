@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Reveal from "../components/effects/Reveal";
+import SplitText from "../components/effects/SplitText";
 import Button from "../components/ui/Button";
 import { EstadoVacio } from "../components/ui/Estados";
 import { Input, OpcionesTarjeta, Select } from "../components/ui/Field";
@@ -91,9 +92,7 @@ export default function PedidoPage() {
     return (
         <section className="pagina campo-frutilla" aria-labelledby="titulo-pedido">
             <div className="pagina__interior">
-                <h1 className="pagina__titulo" id="titulo-pedido">
-                    Mi pedido
-                </h1>
+                <SplitText como="h1" id="titulo-pedido" className="pagina__titulo" texto="Mi pedido" />
 
                 <div className="pedido">
                     <ul className="pedido__items">
@@ -106,14 +105,17 @@ export default function PedidoPage() {
                                     <h2 className="pedido-item__nombre">{item.nombre}</h2>
                                     <p>{formatearPrecio(item.precio)} c/u</p>
                                 </div>
-                                <QuantityStepper
-                                    valor={item.cantidad}
-                                    maximo={item.stock}
-                                    alCambiar={(valor) => cambiarCantidad(item.productoId, valor)}
-                                    nombre={item.nombre}
-                                />
+                                <div className="pedido-item__cantidad">
+                                    <QuantityStepper
+                                        valor={item.cantidad}
+                                        maximo={item.stock}
+                                        alCambiar={(valor) => cambiarCantidad(item.productoId, valor)}
+                                        nombre={item.nombre}
+                                    />
+                                </div>
                                 <p className="pedido-item__subtotal">{formatearPrecio(item.precio * item.cantidad)}</p>
                                 <Button
+                                    className="pedido-item__quitar"
                                     variante="fantasma"
                                     tamano="chico"
                                     icono="basura"

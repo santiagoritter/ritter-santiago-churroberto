@@ -891,3 +891,96 @@ html[data-precarga="activa"] {
         animation-duration: 3s !important;
     }
 }
+
+/* ---------- Regla de progreso con estrella viajera ---------- */
+.progreso {
+    display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+    .progreso {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: calc(var(--z-header) + 1);
+        display: block;
+        height: 6px;
+        pointer-events: none;
+    }
+
+    .progreso__barra {
+        display: block;
+        height: 100%;
+        background: var(--cacao);
+        border-bottom: 2px solid var(--azucar);
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: progreso-barra linear both;
+        animation-timeline: scroll(root);
+    }
+
+    .progreso__estrella {
+        position: absolute;
+        top: -2px;
+        left: 0;
+        display: block;
+        color: var(--frutilla);
+        filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff)
+            drop-shadow(0 -2px 0 #fff);
+        animation: progreso-estrella linear both;
+        animation-timeline: scroll(root);
+    }
+
+    @keyframes progreso-barra {
+        to {
+            transform: scaleX(1);
+        }
+    }
+
+    @keyframes progreso-estrella {
+        to {
+            transform: translateX(calc(100vw - 22px)) rotate(720deg);
+        }
+    }
+}
+
+/* ---------- Dibujos de producto: respiran apenas ---------- */
+.detalle__arte .producto-arte {
+    animation: mece 5s ease-in-out infinite;
+}
+
+@keyframes mece {
+    50% {
+        transform: translateY(-0.5rem) rotate(-2.5deg);
+    }
+}
+
+/* ---------- En pantallas táctiles no hay "hover": nada se queda trabado después de tocar ---------- */
+@media (hover: none) {
+    .boton:hover:not(:disabled) {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .ficha:hover {
+        transform: rotate(var(--inclinacion, 0deg));
+        box-shadow: var(--sombra-sticker);
+    }
+
+    .ficha:hover .producto-arte {
+        transform: none;
+    }
+
+    .carrito-boton:hover,
+    .filtro:hover,
+    .opciones-tarjeta__opcion:hover .opciones-tarjeta__cuerpo {
+        transform: none;
+    }
+
+    .cabecera__enlaces a:hover:not([aria-current="page"]),
+    .cabecera__salir:hover {
+        background: none;
+        transform: none;
+    }
+}

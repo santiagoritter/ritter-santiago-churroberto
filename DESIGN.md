@@ -25,13 +25,14 @@ Cacao sobre cada campo cumple contraste AA (medido con axe-core, 0 problemas en 
 
 ## Componentes
 
-`components/ui` tiene los reutilizables: `Button`, `Field` (`Input`, `Textarea`, `Select`, `OpcionesTarjeta`), `QuantityStepper`, `Estados` (cargando, error, vacío, esqueleto), `Insignia`, `Icon`, `Estrella`, `ProductoArte`. Los avisos usan un único sistema (`ToastContext`) y las confirmaciones un único diálogo (`ConfirmContext`).
+`components/ui` tiene los reutilizables: `Button`, `Field` (`Input`, `Textarea`, `Select`, `OpcionesTarjeta`), `QuantityStepper`, `Estados` (cargando, error, vacío, esqueleto), `Insignia`, `Icon`, `Estrella` y `ProductoArte`. Este último dibuja cada producto en SVG: la docena y la media docena son la caja blanca atada con piolín, con la cantidad en un sticker (12 o 6); los rellenos llevan su gota de dulce de leche o chocolate. Los avisos usan un único sistema (`ToastContext`) y las confirmaciones un único diálogo (`ConfirmContext`).
 
 ## Movimiento
 
 | Efecto | Cómo se hace |
 |---|---|
-| Churro 3D que rueda y cambia de pose | React Three Fiber, geometría generada por código, poses en `churro3d/poses.js` |
+| Churro 3D que rueda y cambia de pose | React Three Fiber, geometría generada por código, poses en `churro3d/poses.js`. Entra girando cuando termina la pantalla de carga |
+| Borde blanco de sticker del churro | Dos pasos con el buffer de stencil: el churro marca su silueta y el borde, empujado un número fijo de píxeles, solo se dibuja fuera de esa marca (`churro3d/materialContorno.js`). Así no se cuela en los surcos ni cambia de grosor |
 | Corte con relleno | Plano de recorte animado con el scroll de la sección fijada |
 | Sección "Cómo se hace" fijada | GSAP ScrollTrigger con `pin` |
 | Texto que se enciende palabra por palabra | GSAP `scrub` |
@@ -40,7 +41,10 @@ Cacao sobre cada campo cumple contraste AA (medido con axe-core, 0 problemas en 
 | Sello giratorio y palabra gigante | CSS `animation-timeline: scroll()` |
 | Fichas con parallax | CSS `animation-timeline: view()` |
 | Pantalla de carga con franjas de toldo | CSS, solo la primera vez de cada sesión |
-| Transición entre páginas | View Transitions de React Router |
+| Transición entre páginas | View Transitions de React Router: la página nueva baja como una persiana |
+| El producto vuela al carrito | Web Animations API sobre una copia del dibujo (`utils/volarAlCarrito.js`) |
+| Estrella viajera en el borde de arriba | CSS `animation-timeline: scroll()`: una regla fina con una estrella que cruza la pantalla |
+| Nombre gigante en el pie | CSS (contenido generado) que sube al entrar con `animation-timeline: view()` |
 | Scroll suave, cursor propio, botones magnéticos | Lenis y JavaScript; el cursor y el magnetismo solo con mouse |
 
 **Reglas:** todo respeta `prefers-reduced-motion` (sin pantalla de carga, sin 3D en movimiento, cintas quietas, pasos siempre visibles). El contenido está en el HTML aunque falle JavaScript o WebGL; sin WebGL se muestra un dibujo 2D del churro. El único efecto con rebote es `--ease-pop`, usado en los stickers a propósito.

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Button from "../components/ui/Button";
 import { Cargando, EstadoError, EstadoVacio } from "../components/ui/Estados";
+import FichaProducto from "../components/productos/FichaProducto";
 import ProductoArte from "../components/ui/ProductoArte";
 import QuantityStepper from "../components/ui/QuantityStepper";
 import { useCart } from "../context/CartContext";
@@ -9,8 +10,9 @@ import { useToast } from "../context/ToastContext";
 import { useAsync } from "../hooks/useAsync";
 import { useTitulo } from "../hooks/useTitulo";
 import { listarCategorias } from "../services/categoriasService";
-import { obtenerProducto } from "../services/productosService";
+import { listarProductos, obtenerProducto } from "../services/productosService";
 import { formatearPrecio } from "../utils/format";
+import { volarAlCarrito } from "../utils/volarAlCarrito";
 
 export default function ProductoPage() {
     const { id } = useParams();
@@ -20,6 +22,7 @@ export default function ProductoPage() {
 
     const producto = useAsync((signal) => obtenerProducto(id, { signal }), [id]);
     const categorias = useAsync((signal) => listarCategorias({ signal }));
+    const todos = useAsync((signal) => listarProductos({ signal }));
     useTitulo(producto.datos?.nombre ?? "Producto");
 
     if (producto.cargando) return <Cargando etiqueta="Cargando el producto" />;
@@ -53,8 +56,10 @@ export default function ProductoPage() {
     const categoria = categorias.datos?.find((c) => c.id === datos.categoriaId)?.nombre ?? "";
     const enPedido = items.find((item) => item.productoId === datos.id)?.cantidad ?? 0;
     const disponible = Math.max(0, datos.stock - enPedido);
+    const relacionados = (todos.datos ?? []).filter((otro) => otro.id !== datos.id).slice(0, 3);
 
     const sumar = () => {
+        volarAlCarrito(document.querySelector(".detalle__arte .producto-arte"));
         agregar(datos, cantidad);
         toast.exito(`Sumaste ${cantidad} ${cantidad === 1 ? "unidad" : "unidades"} de ${datos.nombre}.`);
         setCantidad(1);
@@ -112,6 +117,27 @@ export default function ProductoPage() {
                         )}
                     </div>
                 </div>
+
+                {relacionados.length > 0 && (
+                    <section className="relacionados" aria-labelledby="titulo-relacionados">
+                        <h2 className="relacionados__titulo" id="titulo-relacionados">
+                            También te puede gustar
+                        </h2>
+                        <ul className="rejilla-fichas">
+                            {relacionados.map((otro, indice) => (
+                                <li key={otro.id}>
+                                    <FichaProducto
+                                        producto={otro}
+                                        categoria={
+                                            categorias.datos?.find((c) => c.id === otro.categoriaId)?.nombre ?? ""
+                                        }
+                                        indice={indice + 1}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
             </div>
         </section>
     );

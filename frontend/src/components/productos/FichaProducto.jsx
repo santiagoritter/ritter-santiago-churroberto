@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
 import { formatearPrecio } from "../../utils/format";
+import { volarAlCarrito } from "../../utils/volarAlCarrito";
 import Button from "../ui/Button";
 import ProductoArte from "../ui/ProductoArte";
 
@@ -18,7 +19,8 @@ export default function FichaProducto({ producto, categoria, indice = 0, nivelTi
     const campo = CAMPOS[indice % CAMPOS.length];
     const inclinacion = [-2.2, 1.6, -1.2, 2.4][indice % 4];
 
-    const sumar = () => {
+    const sumar = (evento) => {
+        volarAlCarrito(evento.currentTarget.closest(".ficha")?.querySelector(".producto-arte"));
         agregar(producto, 1);
         toast.exito(`Sumaste ${producto.nombre} a tu pedido.`);
     };

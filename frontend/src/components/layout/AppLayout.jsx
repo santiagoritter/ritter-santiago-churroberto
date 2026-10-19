@@ -4,6 +4,7 @@ import { useSmoothScroll } from "../../hooks/useSmoothScroll";
 import { irA, irArriba } from "../../utils/smoothScroll";
 import CustomCursor from "../effects/CustomCursor";
 import Preloader from "../effects/Preloader";
+import ProgresoScroll from "../effects/ProgresoScroll";
 import Footer from "./Footer";
 import Header from "./Header";
 
@@ -45,6 +46,7 @@ export default function AppLayout() {
             </a>
             <Preloader />
             <CustomCursor />
+            <ProgresoScroll />
             <Header />
             <main id="contenido" ref={principal} tabIndex={-1}>
                 <Outlet />

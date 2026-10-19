@@ -73,6 +73,7 @@ export default function Footer() {
             <p className="pie__aviso">
                 Proyecto académico. El menú y los precios son de ejemplo hasta que el local cargue los suyos.
             </p>
+            <div className="pie__gigante" aria-hidden="true" />
         </footer>
     );
 }

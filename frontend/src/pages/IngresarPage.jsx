@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import SplitText from "../components/effects/SplitText";
 import Button from "../components/ui/Button";
 import { Input } from "../components/ui/Field";
 import { useAuth } from "../context/AuthContext";
@@ -48,9 +49,7 @@ export default function IngresarPage() {
     return (
         <section className="pagina campo-celeste" aria-labelledby="titulo-ingresar">
             <div className="pagina__interior pagina__interior--angosto">
-                <h1 className="pagina__titulo" id="titulo-ingresar">
-                    Ingresar
-                </h1>
+                <SplitText como="h1" id="titulo-ingresar" className="pagina__titulo" texto="Ingresar" />
                 <form className="formulario sticker sticker--formulario" onSubmit={enviar} noValidate>
                     <Input
                         etiqueta="Email"

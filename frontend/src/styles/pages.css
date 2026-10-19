@@ -468,7 +468,7 @@
 }
 
 ::view-transition-new(root) {
-    animation: 0.5s var(--ease-salida) both pagina-entra;
+    animation: 0.75s var(--ease-salida) both persiana-baja;
 }
 
 @keyframes pagina-sale {
@@ -478,10 +478,14 @@
     }
 }
 
-@keyframes pagina-entra {
+/* La página nueva baja como la persiana de un local */
+@keyframes persiana-baja {
     from {
-        opacity: 0;
-        transform: translateY(1.5rem);
+        clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+        clip-path: inset(0 0 0 0);
     }
 }
 
@@ -503,11 +507,34 @@
     }
 
     .pedido-item {
-        grid-template-columns: 4.5rem minmax(0, 1fr);
+        grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+        grid-template-areas:
+            "arte datos datos"
+            "cantidad cantidad subtotal"
+            "quitar quitar quitar";
+    }
+
+    .pedido-item__arte {
+        grid-area: arte;
+    }
+
+    .pedido-item__datos {
+        grid-area: datos;
+    }
+
+    .pedido-item__cantidad {
+        grid-area: cantidad;
     }
 
     .pedido-item__subtotal {
-        text-align: left;
+        grid-area: subtotal;
+        min-width: 0;
+    }
+
+    .pedido-item__quitar {
+        grid-area: quitar;
+        justify-self: start;
+        margin-left: -0.4rem;
     }
 }
 
@@ -515,5 +542,64 @@
     ::view-transition-old(root),
     ::view-transition-new(root) {
         animation-duration: 0.01ms;
+    }
+}
+
+/* ---------- Detalle: volver y productos relacionados ---------- */
+.pagina__interior > .boton {
+    justify-self: start;
+}
+
+.relacionados {
+    display: grid;
+    gap: 1.6rem;
+    margin-top: clamp(2rem, 5vw, 4rem);
+}
+
+.relacionados__titulo {
+    font-size: var(--fs-h3);
+}
+
+/* ---------- Estrellas sueltas en las páginas internas ---------- */
+.pagina {
+    --estrella-adorno: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpolygon%20points='37%2C20%2031.8%2C22.9%2036.6%2C28.5%2028.4%2C27.4%2028.7%2C35.5%2022.1%2C31.4%2019.7%2C38.8%2017.4%2C31.4%2010.8%2C35.5%2011.1%2C27.4%202.9%2C28.5%207.7%2C22.9%202.5%2C20%207.7%2C17.1%202.9%2C11.5%2011.1%2C12.6%2010.8%2C4.5%2017.4%2C8.6%2020%2C1.2%2022.1%2C8.6%2028.7%2C4.5%2028.4%2C12.6%2036.6%2C11.5%2031.8%2C17.1'%20fill='%23ffd84a'%20stroke='%23fff'%20stroke-width='3'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.pagina.campo-manteca {
+    --estrella-adorno: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpolygon%20points='37%2C20%2031.8%2C22.9%2036.6%2C28.5%2028.4%2C27.4%2028.7%2C35.5%2022.1%2C31.4%2019.7%2C38.8%2017.4%2C31.4%2010.8%2C35.5%2011.1%2C27.4%202.9%2C28.5%207.7%2C22.9%202.5%2C20%207.7%2C17.1%202.9%2C11.5%2011.1%2C12.6%2010.8%2C4.5%2017.4%2C8.6%2020%2C1.2%2022.1%2C8.6%2028.7%2C4.5%2028.4%2C12.6%2036.6%2C11.5%2031.8%2C17.1'%20fill='%23ff7db5'%20stroke='%23fff'%20stroke-width='3'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.pagina.campo-frutilla {
+    --estrella-adorno: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpolygon%20points='37%2C20%2031.8%2C22.9%2036.6%2C28.5%2028.4%2C27.4%2028.7%2C35.5%2022.1%2C31.4%2019.7%2C38.8%2017.4%2C31.4%2010.8%2C35.5%2011.1%2C27.4%202.9%2C28.5%207.7%2C22.9%202.5%2C20%207.7%2C17.1%202.9%2C11.5%2011.1%2C12.6%2010.8%2C4.5%2017.4%2C8.6%2020%2C1.2%2022.1%2C8.6%2028.7%2C4.5%2028.4%2C12.6%2036.6%2C11.5%2031.8%2C17.1'%20fill='%235bc0f8'%20stroke='%23fff'%20stroke-width='3'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.pagina::before,
+.pagina::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    background: var(--estrella-adorno) center / contain no-repeat;
+    pointer-events: none;
+    animation: mece-estrella 7s ease-in-out infinite;
+}
+
+.pagina::before {
+    top: 7.5rem;
+    right: 6%;
+    width: clamp(3rem, 8vw, 6.5rem);
+    aspect-ratio: 1;
+}
+
+.pagina::after {
+    bottom: 5rem;
+    left: 3%;
+    width: clamp(2rem, 5vw, 4rem);
+    aspect-ratio: 1;
+    animation-delay: -3s;
+}
+
+@keyframes mece-estrella {
+    50% {
+        transform: translateY(-0.8rem) rotate(14deg);
     }
 }

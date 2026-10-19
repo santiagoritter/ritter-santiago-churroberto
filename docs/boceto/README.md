@@ -8,7 +8,7 @@ Las capturas de esta carpeta son del sitio ya construido y funcionan como boceto
 |---|---|
 | `01-inicio-escritorio.jpg` | Primera pantalla: titular con borde de sticker, churro 3D, sello giratorio y estado "Abierto ahora" |
 | `02-como-se-hace-corte.jpg` | Sección fijada con scroll: el churro se frena y se abre en corte longitudinal para mostrar el relleno |
-| `03-menu.jpg` | Menú desde la API, con fichas inclinadas y el borde festoneado como toldo |
+| `03-menu.jpg` | Menú desde la API: fichas inclinadas con la caja de la docena atada con piolín y el borde festoneado como toldo |
 | `04-local.jpg` | Dirección, horarios, mapa y el churro asomando |
 | `05-inicio-celular.jpg`, `06-como-se-hace-celular.jpg` | Versión móvil |
 

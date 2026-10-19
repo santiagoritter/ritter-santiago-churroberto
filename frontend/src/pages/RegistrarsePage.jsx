@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import SplitText from "../components/effects/SplitText";
 import Button from "../components/ui/Button";
 import { Input } from "../components/ui/Field";
 import { useAuth } from "../context/AuthContext";
@@ -55,9 +56,7 @@ export default function RegistrarsePage() {
     return (
         <section className="pagina campo-manteca" aria-labelledby="titulo-registro">
             <div className="pagina__interior pagina__interior--angosto">
-                <h1 className="pagina__titulo" id="titulo-registro">
-                    Crear cuenta
-                </h1>
+                <SplitText como="h1" id="titulo-registro" className="pagina__titulo" texto="Crear cuenta" />
                 <form className="formulario sticker sticker--formulario" onSubmit={enviar} noValidate>
                     <div className="formulario__fila">
                         <Input

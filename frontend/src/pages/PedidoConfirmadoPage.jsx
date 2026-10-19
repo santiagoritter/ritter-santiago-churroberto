@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import Estrella from "../components/ui/Estrella";
+import SplitText from "../components/effects/SplitText";
 import Button from "../components/ui/Button";
 import { Cargando, EstadoError } from "../components/ui/Estados";
 import Insignia from "../components/ui/Insignia";
@@ -44,9 +45,7 @@ export default function PedidoConfirmadoPage() {
                         />
                     ))}
                 </div>
-                <h1 className="pagina__titulo" id="titulo-confirmado">
-                    ¡Pedido en marcha!
-                </h1>
+                <SplitText como="h1" id="titulo-confirmado" className="pagina__titulo" texto="¡Pedido en|marcha!" />
                 <p className="pagina__bajada">Anotamos tu pedido número {pedido.id}. El pago se hace al recibirlo.</p>
 
                 <div className="comprobante sticker">
