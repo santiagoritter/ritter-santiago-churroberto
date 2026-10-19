@@ -1,0 +1,28 @@
+# Despliegue de la API en Render (plan gratuito). El sitio vive en Vercel.
+services:
+    - type: web
+      name: churroberto-api
+      runtime: node
+      plan: free
+      rootDir: backend
+      buildCommand: npm ci
+      startCommand: npm start
+      healthCheckPath: /health
+      envVars:
+          - key: NODE_VERSION
+            value: "22"
+          - key: NODE_ENV
+            value: production
+          # Origen del sitio publicado: la API solo acepta pedidos desde ahí.
+          - key: CORS_ORIGIN
+            value: https://churroberto-web.vercel.app
+          # Render pone un proxy delante: hace falta para ver la IP real en el límite de intentos.
+          - key: TRUST_PROXY
+            value: "1"
+          - key: ADMIN_EMAIL
+            value: admin@churroberto.com
+          - key: JWT_SECRET
+            generateValue: true
+          # Render pregunta este valor al crear el servicio. No se guarda en el repo.
+          - key: ADMIN_PASSWORD
+            sync: false
