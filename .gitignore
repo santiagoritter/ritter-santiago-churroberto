@@ -1,3 +1,23 @@
+# Dependencias y builds
 node_modules/
+dist/
+build/
+
+# Variables de entorno (el .env.example sí se versiona)
 .env
+.env.local
+.env.*.local
+
+# Herramientas de trabajo (skills de diseño, config local de agentes)
+.claude/
+.agents/
+skills-lock.json
+
+# Sistema y editores
 .DS_Store
+.vscode/
+.idea/
+*.log
+
+# Estado de sesión de impeccable (el brief de la superficie sí se versiona)
+.impeccable/questions/
