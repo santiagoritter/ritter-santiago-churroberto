@@ -22,6 +22,14 @@ Las entidades se infieren a partir de las páginas del wireframe de baja fidelid
 - **Pedido**: compra confirmada por el usuario a partir del carrito.
 - **ItemPedido**: línea del pedido (producto, cantidad y precio al momento de la compra).
 
+### Agregado en la Entrega 2
+
+- **Usuario.rol**: distingue al cliente (`CLIENTE`) del administrador del local (`ADMIN`), que gestiona productos y pedidos.
+- **Pedido.tipoEntrega**: el pedido es para retirar en el local (`RETIRO`, sin dirección) o con envío (`ENVIO`, con `direccionEntrega`).
+- **ItemPedido.nombreProducto**: copia del nombre al momento de la compra, para que el pedido no cambie si el producto se edita o se elimina.
+- **Local**: datos del negocio (dirección, coordenadas, horarios) que muestra el sitio.
+- **Resena**: opiniones de clientes que se muestran en el sitio.
+
 ## Diagrama de clases (Mermaid)
 
 ```mermaid
@@ -35,6 +43,7 @@ classDiagram
         +string contrasena
         +string direccion
         +Date fechaRegistro
+        +string rol
         +registrar()
         +iniciarSesion()
         +actualizarPerfil()
@@ -88,6 +97,7 @@ classDiagram
         +string direccionEntrega
         +string metodoPago
         +ItemPedido[] items
+        +string tipoEntrega
         +confirmar()
         +cancelar()
         +calcularTotal()
@@ -100,7 +110,31 @@ classDiagram
         +int cantidad
         +float precioUnitario
         +float subtotal
+        +string nombreProducto
         +calcularSubtotal()
+    }
+
+    class Local {
+        +int id
+        +string nombre
+        +string direccion
+        +string barrio
+        +string ciudad
+        +float latitud
+        +float longitud
+        +string telefono
+        +string whatsapp
+        +Horario[] horarios
+        +string descripcion
+        +estaAbierto(fecha)
+    }
+
+    class Resena {
+        +int id
+        +string autor
+        +string texto
+        +int puntaje
+        +string fuente
     }
 
     Usuario "1" --> "1" Carrito : posee
@@ -120,5 +154,6 @@ classDiagram
 - Un **Pedido** contiene muchos **ItemPedido** (composición).
 - Cada **ItemCarrito** y cada **ItemPedido** referencian un **Producto**.
 
-> Nota: los métodos listados corresponden al diseño del dominio. En la Entrega 1 las clases
-> JavaScript de `Backend/src/models/` solo implementan el constructor y los atributos, sin lógica.
+> Nota: los métodos listados corresponden al diseño del dominio. Las clases JavaScript de
+> `backend/src/models/` solo implementan el constructor y los atributos, sin lógica. A partir de la
+> Entrega 2 esa lógica vive en `backend/src/services/` y el acceso a los datos en `backend/src/repositories/`.
