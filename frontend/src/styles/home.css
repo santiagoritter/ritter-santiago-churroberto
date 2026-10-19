@@ -604,10 +604,6 @@
         padding: 0.6rem 1rem;
     }
 
-    .paso:not(.paso--activo) .paso__titulo + p {
-        display: none;
-    }
-
     .local__grilla {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -639,5 +635,60 @@
 
     .hero__pista-flecha {
         animation: none;
+    }
+}
+
+/* ---------- Cómo se hace en pantallas bajas ---------- */
+/* La escena queda fijada del tamaño de la ventana: si es baja, la lista de pasos se compacta para entrar entera.
+   Las descripciones de los pasos que no están activos se pliegan con una transición (en el celular también). */
+@media (max-width: 48rem), (max-height: 44rem) {
+    .paso__titulo + p {
+        max-height: 5rem;
+        overflow: hidden;
+        transition:
+            max-height 0.5s var(--ease-salida),
+            opacity 0.4s ease;
+    }
+
+    .paso:not(.paso--activo) .paso__titulo + p {
+        max-height: 0;
+        opacity: 0;
+    }
+}
+
+@media (min-width: 48.01rem) and (max-height: 50rem) {
+    .proceso__escena {
+        padding-block: 5.2rem 1.4rem;
+    }
+
+    .proceso__texto {
+        gap: 0.9rem;
+    }
+
+    .proceso__titulo {
+        font-size: clamp(2rem, 9svh, 3.6rem);
+    }
+
+    .proceso__pasos {
+        gap: 0.25rem;
+    }
+
+    .paso {
+        padding: 0.45rem 1.1rem;
+    }
+
+    .paso__dibujo {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .paso__titulo {
+        font-size: 1.3rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .paso__titulo + p {
+        transition: none;
     }
 }

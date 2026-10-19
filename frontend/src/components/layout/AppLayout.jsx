@@ -22,6 +22,11 @@ export default function AppLayout() {
             let intentos = 0;
             let temporizador;
             const buscar = () => {
+                // Mientras corre la pantalla de carga el scroll está frenado: se espera a que termine.
+                if (document.documentElement.dataset.precarga === "activa") {
+                    temporizador = setTimeout(buscar, 150);
+                    return;
+                }
                 if (document.querySelector(hash)) irA(hash);
                 else if (intentos < 25) {
                     intentos += 1;

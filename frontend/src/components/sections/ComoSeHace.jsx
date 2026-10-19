@@ -75,6 +75,9 @@ export default function ComoSeHace() {
                 end: "+=240%",
                 pin: ".proceso__escena",
                 scrub: true,
+                // Se mide antes que la pose de la sección: así el espacio que agrega el pin ya cuenta en el rango de
+                // la pose y el churro la conserva también al subir (sin esto se quedaba con la del menú).
+                refreshPriority: 1,
                 onUpdate: (self) => {
                     const paso = Math.min(PASOS.length - 1, Math.floor(self.progress * PASOS.length));
                     setActivo((anterior) => (anterior === paso ? anterior : paso));

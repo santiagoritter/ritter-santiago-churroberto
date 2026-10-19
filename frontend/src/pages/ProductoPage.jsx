@@ -1,20 +1,35 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import CompraProducto from "../components/productos/CompraProducto";
+import Relacionados from "../components/productos/Relacionados";
 import Button from "../components/ui/Button";
 import { Cargando, EstadoError, EstadoVacio } from "../components/ui/Estados";
-import FichaProducto from "../components/productos/FichaProducto";
 import ProductoArte from "../components/ui/ProductoArte";
-import QuantityStepper from "../components/ui/QuantityStepper";
-import { useCart } from "../context/CartContext";
-import { useToast } from "../context/ToastContext";
 import { useAsync } from "../hooks/useAsync";
 import { useTitulo } from "../hooks/useTitulo";
 import { listarCategorias } from "../services/categoriasService";
 import { listarProductos, obtenerProducto } from "../services/productosService";
-import { formatearPrecio } from "../utils/format";
-import { chispas } from "../utils/chispas";
-import { volarAlCarrito } from "../utils/volarAlCarrito";
-import { reaccionarChurro } from "../components/churro3d/poses";
+
+// Cuando el producto no existe más o la API falla: un mensaje en lugar de la ficha.
+function ProductoSinDatos({ error, alReintentar }) {
+    const noExiste = error.status === 404 || error.status === 400;
+    return (
+        <section className="pagina campo-celeste">
+            <div className="pagina__interior">
+                {noExiste ? (
+                    <EstadoVacio
+                        nivel={1}
+                        titulo="No encontramos este producto"
+                        mensaje="Puede que ya no esté en el menú."
+                        accion={<Button to="/menu">Ver el menú</Button>}
+                    />
+                ) : (
+                    <EstadoError nivel={1} mensaje={error.message} alReintentar={alReintentar} />
+                )}
+            </div>
+        </section>
+    );
+}
 
 export default function ProductoPage() {
     const { id } = useParams();
@@ -22,59 +37,23 @@ export default function ProductoPage() {
     // al detalle) mientras se pide la versión actualizada a la API.
     const { state } = useLocation();
     const previo = state?.producto?.id === Number(id) ? state : null;
-    const { agregar, items, abrirCajon } = useCart();
-    const toast = useToast();
-    const [cantidad, setCantidad] = useState(1);
 
     const producto = useAsync((signal) => obtenerProducto(id, { signal }), [id]);
     const categorias = useAsync((signal) => listarCategorias({ signal }));
     const todos = useAsync((signal) => listarProductos({ signal }));
     useTitulo(producto.datos?.nombre ?? previo?.producto.nombre ?? "Producto");
 
+    const nombresDeCategoria = useMemo(
+        () => new Map(categorias.datos?.map((categoria) => [categoria.id, categoria.nombre])),
+        [categorias.datos]
+    );
+
     if (producto.cargando && !previo) return <Cargando etiqueta="Cargando el producto" />;
-
-    if (producto.error?.status === 404 || producto.error?.status === 400) {
-        return (
-            <section className="pagina campo-celeste">
-                <div className="pagina__interior">
-                    <EstadoVacio
-                        nivel={1}
-                        titulo="No encontramos este producto"
-                        mensaje="Puede que ya no esté en el menú."
-                        accion={<Button to="/menu">Ver el menú</Button>}
-                    />
-                </div>
-            </section>
-        );
-    }
-
-    if (producto.error) {
-        return (
-            <section className="pagina campo-celeste">
-                <div className="pagina__interior">
-                    <EstadoError nivel={1} mensaje={producto.error.message} alReintentar={producto.recargar} />
-                </div>
-            </section>
-        );
-    }
+    if (producto.error) return <ProductoSinDatos error={producto.error} alReintentar={producto.recargar} />;
 
     const datos = producto.datos ?? previo.producto;
-    const categoria = categorias.datos?.find((c) => c.id === datos.categoriaId)?.nombre ?? previo?.categoria ?? "";
-    const enPedido = items.find((item) => item.productoId === datos.id)?.cantidad ?? 0;
-    const disponible = Math.max(0, datos.stock - enPedido);
+    const categoria = nombresDeCategoria.get(datos.categoriaId) ?? previo?.categoria ?? "";
     const relacionados = (todos.datos ?? []).filter((otro) => otro.id !== datos.id).slice(0, 3);
-
-    const sumar = (evento) => {
-        volarAlCarrito(document.querySelector(".detalle__arte .producto-arte"));
-        chispas(evento.currentTarget);
-        reaccionarChurro();
-        agregar(datos, cantidad);
-        toast.exito(`Sumaste ${cantidad} ${cantidad === 1 ? "unidad" : "unidades"} de ${datos.nombre}.`, {
-            texto: "Ver pedido",
-            alHacer: abrirCajon
-        });
-        setCantidad(1);
-    };
 
     return (
         <section className="pagina campo-celeste" aria-labelledby="titulo-producto">
@@ -91,65 +70,9 @@ export default function ProductoPage() {
                             nombreTransicion={`arte-${datos.id}`}
                         />
                     </div>
-                    <div className="detalle__info">
-                        <h1 className="pagina__titulo pagina__titulo--chico" id="titulo-producto">
-                            {datos.nombre}
-                        </h1>
-                        <p className="detalle__texto">{datos.descripcion}</p>
-                        <p className="detalle__precio">{formatearPrecio(datos.precio)}</p>
-                        {disponible === 0 ? (
-                            <p className="detalle__aviso" role="status">
-                                {datos.stock === 0
-                                    ? "Por ahora no hay stock."
-                                    : "Ya sumaste todo lo que hay disponible."}
-                            </p>
-                        ) : (
-                            <>
-                                {disponible <= 5 && <p className="detalle__aviso">Quedan pocas unidades.</p>}
-                                <div className="detalle__acciones">
-                                    <QuantityStepper
-                                        valor={cantidad}
-                                        maximo={disponible}
-                                        alCambiar={(valor) => setCantidad(Math.max(1, valor))}
-                                        nombre={datos.nombre}
-                                    />
-                                    <Button icono="carrito" onClick={sumar}>
-                                        Sumar al pedido
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                        {enPedido > 0 && (
-                            <p className="detalle__nota">
-                                Ya tenés {enPedido} en tu pedido.{" "}
-                                <Button to="/pedido" variante="fantasma" tamano="chico">
-                                    Ver mi pedido
-                                </Button>
-                            </p>
-                        )}
-                    </div>
+                    <CompraProducto key={datos.id} producto={datos} />
                 </div>
-
-                {relacionados.length > 0 && (
-                    <section className="relacionados" aria-labelledby="titulo-relacionados">
-                        <h2 className="relacionados__titulo" id="titulo-relacionados">
-                            También te puede gustar
-                        </h2>
-                        <ul className="rejilla-fichas">
-                            {relacionados.map((otro, indice) => (
-                                <li key={otro.id}>
-                                    <FichaProducto
-                                        producto={otro}
-                                        categoria={
-                                            categorias.datos?.find((c) => c.id === otro.categoriaId)?.nombre ?? ""
-                                        }
-                                        indice={indice + 1}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
-                    </section>
-                )}
+                <Relacionados productos={relacionados} nombresDeCategoria={nombresDeCategoria} />
             </div>
         </section>
     );
