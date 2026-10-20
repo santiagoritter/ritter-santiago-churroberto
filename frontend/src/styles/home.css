@@ -501,10 +501,31 @@
 
 /* ---------- Cierre ---------- */
 .cierre {
+    /* Cuánto se queda quieta la pantalla mientras se sigue scrolleando: el churro, grande, hace su momento. */
+    --retencion: 60svh;
+    min-height: calc(100svh + var(--retencion));
+    padding-block: 0;
+}
+
+.cierre__escena {
+    position: sticky;
+    top: 0;
+    /* Una caja fija arma su propia capa: sin esto, el título quedaría por debajo del churro. */
+    z-index: var(--z-contenido);
     display: grid;
     align-items: end;
     min-height: 100svh;
-    padding-bottom: clamp(4rem, 9vw, 7rem);
+    padding-block: clamp(5rem, 11vw, 9rem) clamp(4rem, 9vw, 7rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cierre {
+        --retencion: 0px;
+    }
+
+    .cierre__escena {
+        position: static;
+    }
 }
 
 .cierre__interior {
@@ -525,7 +546,7 @@
     color: var(--manteca);
 }
 
-/* Marca invisible al final del cierre: avisa al churro que es hora de irse */
+/* Marca invisible al final del cierre: avisa al churro que es hora de acomodarse en la esquina */
 .cierre__marca-salida {
     position: absolute;
     right: 0;

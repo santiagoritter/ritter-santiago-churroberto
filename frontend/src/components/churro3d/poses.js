@@ -21,7 +21,7 @@ const ESCRITORIO = {
     resenas: { x: 0.74, y: 0.18, escala: 0.5, yaw: 0.6, pitch: 0.05, inclinacion: -0.4 },
     local: { x: 0.62, y: 0.68, escala: 0.5, yaw: -0.5, pitch: 0.1, inclinacion: 0.28 },
     cierre: { x: 0.0, y: 0.4, escala: 1.0, yaw: 0.2, pitch: 0.12, inclinacion: -0.16 },
-    salida: { x: 0.0, y: 1.1, escala: 0.001, yaw: 0.2, pitch: 0.12, inclinacion: -0.3 }
+    pie: { x: 0.8, y: 0.78, escala: 0.28, yaw: -0.4, pitch: 0, inclinacion: 0.5 }
 };
 
 const MOVIL = {
@@ -32,7 +32,7 @@ const MOVIL = {
     resenas: { x: 0.72, y: 0.9, escala: 0.26, yaw: 0.6, pitch: 0, inclinacion: -0.4 },
     local: { x: 0.72, y: 0.9, escala: 0.26, yaw: -0.5, pitch: 0.1, inclinacion: 0.28 },
     cierre: { x: 0, y: 0.4, escala: 1.15, yaw: 0.2, pitch: 0.12, inclinacion: -0.16 },
-    salida: { x: 0, y: 1.1, escala: 0.001, yaw: 0.2, pitch: 0.12, inclinacion: -0.3 }
+    pie: { x: 0.7, y: 0.86, escala: 0.26, yaw: -0.4, pitch: 0, inclinacion: 0.5 }
 };
 
 export const obtenerPose = (nombre, esMovil) =>

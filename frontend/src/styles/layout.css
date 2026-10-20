@@ -198,10 +198,15 @@
 .pie {
     position: relative;
     overflow: hidden;
-    z-index: var(--z-contenido);
     padding: clamp(3rem, 7vw, 5rem) var(--gutter) 2rem;
     background: var(--cacao);
     color: var(--azucar);
+}
+
+/* El fondo del pie queda debajo del churro (que sigue a la vista) y su contenido por encima. */
+.pie > * {
+    position: relative;
+    z-index: var(--z-contenido);
 }
 
 .pie__interior {

@@ -17,9 +17,15 @@ export const LIMITES = Object.freeze({
     velocidadParaEfectos: 14
 });
 
+const VELOCIDAD_RUEDA = 0.8;
+const SUAVIZADO = 0.085;
+
 let lenis = null;
 let alTick = null;
 let saltando = false;
+// 1 es la velocidad normal; un valor menor frena la rueda en tramos de la página donde conviene ir despacio.
+let freno = 1;
+let transicionFreno = null;
 
 // Dónde queda el scroll al llegar a un elemento: Lenis respeta el scroll-margin y el scroll-padding de la cabecera fija.
 const metaDeElemento = (elemento) => {
@@ -35,7 +41,7 @@ const suaveEnLosExtremos = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
 const limitarRueda = (evento) => {
     if (!lenis || saltando || evento.ctrlKey) return;
     const adelanto = lenis.targetScroll - lenis.animatedScroll;
-    if (Math.abs(adelanto) > LIMITES.adelantoMaximo && Math.sign(adelanto) === Math.sign(evento.deltaY)) {
+    if (Math.abs(adelanto) > LIMITES.adelantoMaximo * freno && Math.sign(adelanto) === Math.sign(evento.deltaY)) {
         evento.preventDefault();
         evento.stopImmediatePropagation();
     }
@@ -45,7 +51,7 @@ const limitarRueda = (evento) => {
 export const iniciarScrollSuave = () => {
     if (lenis || prefiereMenosMovimiento()) return () => {};
 
-    lenis = new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.8 });
+    lenis = new Lenis({ lerp: SUAVIZADO, smoothWheel: true, wheelMultiplier: VELOCIDAD_RUEDA });
     window.addEventListener("wheel", limitarRueda, { capture: true, passive: false });
     lenis.on("scroll", ScrollTrigger.update);
     alTick = (tiempo) => lenis.raf(tiempo * 1000);
@@ -53,6 +59,8 @@ export const iniciarScrollSuave = () => {
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+        transicionFreno?.kill();
+        freno = 1;
         window.removeEventListener("wheel", limitarRueda, { capture: true });
         gsap.ticker.remove(alTick);
         lenis.destroy();
@@ -60,6 +68,30 @@ export const iniciarScrollSuave = () => {
         alTick = null;
     };
 };
+
+// Cambia de a poco la velocidad de la rueda para que la página no se sienta frenada de golpe. Un freno de 0,4 deja la
+// rueda al 40 % y también acorta cuánto puede adelantarse el destino, así un golpe fuerte no se salta el tramo.
+const ajustarFreno = (factor) => {
+    if (!lenis) return;
+    transicionFreno?.kill();
+    const estado = { freno };
+    transicionFreno = gsap.to(estado, {
+        freno: factor,
+        duration: 0.7,
+        ease: "power2.out",
+        onUpdate: () => {
+            freno = estado.freno;
+            // El multiplicador de la rueda lo lee el detector de gestos de Lenis, que guarda su propia copia.
+            const multiplicador = VELOCIDAD_RUEDA * freno;
+            lenis.options.wheelMultiplier = multiplicador;
+            if (lenis.virtualScroll) lenis.virtualScroll.options.wheelMultiplier = multiplicador;
+            lenis.options.lerp = SUAVIZADO * (0.55 + 0.45 * freno);
+        }
+    });
+};
+
+export const frenarScroll = (factor = 0.4) => ajustarFreno(factor);
+export const soltarScroll = () => ajustarFreno(1);
 
 export const obtenerScrollSuave = () => lenis;
 
