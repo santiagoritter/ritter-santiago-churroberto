@@ -502,7 +502,7 @@
 /* ---------- Cierre ---------- */
 .cierre {
     /* Cuánto se queda quieta la pantalla mientras se sigue scrolleando: el churro, grande, hace su momento. */
-    --retencion: 60svh;
+    --retencion: 35svh;
     min-height: calc(100svh + var(--retencion));
     padding-block: 0;
 }

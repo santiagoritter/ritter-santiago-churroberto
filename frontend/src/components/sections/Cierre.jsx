@@ -14,7 +14,7 @@ export default function Cierre() {
     // se alarga de más a propósito: si terminara justo en el último scroll, al llegar abajo ya no estaría activo.
     const salida = usePoseAlScroll("pie", { inicio: "top 85%", fin: "+=100000" });
     // Desde que se acerca hasta que la pantalla se suelta, la rueda va despacio para disfrutar el momento.
-    useScrollLento(ref, { inicio: "top 40%", fin: "bottom bottom", factor: 0.4 });
+    useScrollLento(ref, { inicio: "top 25%", fin: "bottom bottom", factor: 0.6 });
 
     // Al quedar la pantalla fija, el churro da su vuelta con salto.
     useEffect(() => {
